@@ -1,0 +1,24 @@
+[2023-11-28 09:08:26] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 150 - <module>] 训练失败，失败原因为
+[2023-11-28 09:08:26] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 151 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py", line 137, in <module>
+    for batch_num, (x, label) in enumerate(Lstm_train_dataloader):  # 遍历训练数据加载器
+NameError: name 'Lstm_train_dataloader' is not defined
+
+[2023-11-28 09:09:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 150 - <module>] 训练失败，失败原因为
+[2023-11-28 09:09:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 151 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py", line 137, in <module>
+    for batch_num, (x, label) in enumerate(Lstm_train_dataloader):  # 遍历训练数据加载器
+NameError: name 'Lstm_train_dataloader' is not defined
+
+[2023-11-28 09:11:05] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 150 - <module>] 训练失败，失败原因为
+[2023-11-28 09:11:05] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 151 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py", line 137, in <module>
+    for batch_num, (x, label) in enumerate(Lstm_train_dataloader):  # 遍历训练数据加载器
+NameError: name 'Lstm_train_dataloader' is not defined
+
+[2023-11-28 09:18:57] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 113 - <module>] 构建失败，失败原因为
+[2023-11-28 09:18:57] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py - 114 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\LSTM_train.py", line 108, in <module>
+    Lstm_train_dataset = MyDataset(train_data, window_input_size, window_label_size)  # 构造训练数据集
+NameError: name 'train_data' is not defined
+
