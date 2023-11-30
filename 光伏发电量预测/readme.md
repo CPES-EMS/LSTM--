@@ -78,4 +78,4 @@ python predict_main.py
 
 ## 5、代码所支撑的前端页面
 
-![20231129145333](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231129145333.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231129145333.png)
