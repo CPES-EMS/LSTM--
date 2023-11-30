@@ -1,0 +1,13 @@
+[2023-11-30 16:42:35] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 54 - <module>] 读取成功
+[2023-11-30 16:42:35] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 78 - <module>] 插入数据
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 18 - <module>] 读入数据
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 26 - <module>] 数据读取成功
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 28 - <module>] 构建验证数据集
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 36 - <module>] 构建成功
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 67 - <module>] 绘制图形
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 74 - <module>] 绘制成功
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 86 - <module>] 保存预测结果
+[2023-11-30 16:43:05] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 97 - <module>] 结果保存成功
+[2023-11-30 16:43:06] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 54 - <module>] 读取成功
+[2023-11-30 16:43:06] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 78 - <module>] 插入数据
+[2023-11-30 16:43:07] [info] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 95 - <module>] 数据插入成功

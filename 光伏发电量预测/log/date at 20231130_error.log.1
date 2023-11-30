@@ -1,0 +1,113 @@
+[2023-11-30 08:57:07] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 45, in <module>
+    df = pd.merge(df, raw_data2_re, how='left', on='datetime')
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 148, in merge
+    op = _MergeOperation(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 737, in __init__
+    ) = self._get_merge_keys()
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 1203, in _get_merge_keys
+    right_keys.append(right._get_label_or_level_values(rk))
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\generic.py", line 1778, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'datetime'
+
+[2023-11-30 08:57:24] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:57:24] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 45, in <module>
+    df = pd.merge(df, raw_data2_re, how='left', on='load_time')
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 148, in merge
+    op = _MergeOperation(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 737, in __init__
+    ) = self._get_merge_keys()
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 1203, in _get_merge_keys
+    right_keys.append(right._get_label_or_level_values(rk))
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\generic.py", line 1778, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'load_time'
+
+[2023-11-30 08:58:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:58:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 45, in <module>
+    df = pd.merge(df, raw_data2_re, how='left', on='load_time')
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 148, in merge
+    op = _MergeOperation(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 737, in __init__
+    ) = self._get_merge_keys()
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 1203, in _get_merge_keys
+    right_keys.append(right._get_label_or_level_values(rk))
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\generic.py", line 1778, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'load_time'
+
+[2023-11-30 09:10:01] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 51 - <module>] 读取失败，失败原因为
+[2023-11-30 09:10:02] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 52 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 46, in <module>
+    df['temperature'] = raw_data2_re['temperature'].values[::-1]
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 3950, in __setitem__
+    self._set_item(key, value)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 4143, in _set_item
+    value = self._sanitize_column(value)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 4871, in _sanitize_column
+    return sanitize_array(value, self.index, copy=True, allow_2d=True)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\construction.py", line 569, in sanitize_array
+    subarr = maybe_infer_to_datetimelike(data)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\dtypes\cast.py", line 1196, in maybe_infer_to_datetimelike
+    raise ValueError(value.ndim)  # pragma: no cover
+ValueError: 2
+
+[2023-11-30 09:10:55] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 51 - <module>] 读取失败，失败原因为
+[2023-11-30 09:10:55] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 52 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 46, in <module>
+    df['temperature'] = raw_data2_re['temperature'].values[::-1]
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 3950, in __setitem__
+    self._set_item(key, value)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 4143, in _set_item
+    value = self._sanitize_column(value)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 4871, in _sanitize_column
+    return sanitize_array(value, self.index, copy=True, allow_2d=True)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\construction.py", line 569, in sanitize_array
+    subarr = maybe_infer_to_datetimelike(data)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\dtypes\cast.py", line 1196, in maybe_infer_to_datetimelike
+    raise ValueError(value.ndim)  # pragma: no cover
+ValueError: 2
+
+[2023-11-30 10:45:12] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 70 - <module>] 绘制失败，失败原因为
+[2023-11-30 10:45:12] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 71 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py", line 67, in <module>
+    plt.plot(labels[2].flatten(), label='True Data')
+IndexError: index 2 is out of bounds for axis 0 with size 1
+
+[2023-11-30 10:51:36] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 70 - <module>] 绘制失败，失败原因为
+[2023-11-30 10:51:36] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 71 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py", line 67, in <module>
+    plt.plot(labels[1].flatten(), label='True Data')
+IndexError: index 1 is out of bounds for axis 0 with size 1
+
+[2023-11-30 10:52:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 70 - <module>] 绘制失败，失败原因为
+[2023-11-30 10:52:31] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 71 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py", line 67, in <module>
+    plt.plot(labels[1].flatten(), label='True Data')
+IndexError: index 1 is out of bounds for axis 0 with size 1
+
+[2023-11-30 15:47:59] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 23 - <module>] 读取数据失败, 失败原因为
+[2023-11-30 15:47:59] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 24 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py", line 21, in <module>
+    data = pd.read_csv(filepath, encoding="gbk")
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 912, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 577, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 1407, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 1679, in _make_engine
+    return mapping[engine](f, **self.options)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 93, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+  File "pandas\_libs\parsers.pyx", line 550, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas\_libs\parsers.pyx", line 639, in pandas._libs.parsers.TextReader._get_header
+  File "pandas\_libs\parsers.pyx", line 850, in pandas._libs.parsers.TextReader._tokenize_rows
+  File "pandas\_libs\parsers.pyx", line 861, in pandas._libs.parsers.TextReader._check_tokenize_status
+  File "pandas\_libs\parsers.pyx", line 2021, in pandas._libs.parsers.raise_parser_error
+UnicodeDecodeError: 'gbk' codec can't decode byte 0x8f in position 28: illegal multibyte sequence
+
+[2023-11-30 15:50:37] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 23 - <module>] 读取数据失败, 失败原因为

@@ -1,0 +1,26 @@
+[2023-11-30 15:50:37] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py - 24 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\LSTM_validation.py", line 21, in <module>
+    data = pd.read_csv(filepath, encoding="gbk")
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 912, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 577, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 1407, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\readers.py", line 1679, in _make_engine
+    return mapping[engine](f, **self.options)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\io\parsers\c_parser_wrapper.py", line 93, in __init__
+    self._reader = parsers.TextReader(src, **kwds)
+  File "pandas\_libs\parsers.pyx", line 550, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas\_libs\parsers.pyx", line 639, in pandas._libs.parsers.TextReader._get_header
+  File "pandas\_libs\parsers.pyx", line 850, in pandas._libs.parsers.TextReader._tokenize_rows
+  File "pandas\_libs\parsers.pyx", line 861, in pandas._libs.parsers.TextReader._check_tokenize_status
+  File "pandas\_libs\parsers.pyx", line 2021, in pandas._libs.parsers.raise_parser_error
+UnicodeDecodeError: 'gbk' codec can't decode byte 0x8f in position 28: illegal multibyte sequence
+
+[2023-11-30 16:42:35] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 92 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 16:42:35] [error] [C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py - 93 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏发电量预测\predict_main.py", line 82, in <module>
+    'forcast_value': predictions[4-i-1], 'forcast_type': '4'}
+IndexError: list index out of range
+
