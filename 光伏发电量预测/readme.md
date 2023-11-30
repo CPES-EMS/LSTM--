@@ -54,11 +54,11 @@ python predict_main.py
 
 - 输入：实时数据的时刻、历史光伏发电量、光照强度、温度、湿度、ID等
 
-  ![20231129222004](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231129222004.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231129222004.png)
 
   
 
-  <img src="C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231129222037.png" alt="20231129222037"  />
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231129222037.png)
 
   
 
@@ -68,11 +68,11 @@ python predict_main.py
 
 
 
-![20231130155956](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231130155956.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231130155956.png)
 
 
 
-![20231130164329](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231130164329.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231130164329)
 
 
 
