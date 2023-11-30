@@ -72,7 +72,7 @@ python predict_main.py
 
 
 
-![20231130091904](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231130091904.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8A%9F%E7%8E%87%E9%A2%84%E6%B5%8B/20231130091904.png)
 
 ## 5、代码所支撑的前端页面
 
