@@ -68,7 +68,7 @@ python predict_main.py
 
 - 输出：未来24小时/4小时光伏功率，预测时间，真实时间等
 
-![20231129222125](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231129222125.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8A%9F%E7%8E%87%E9%A2%84%E6%B5%8B/20231129222125.png)
 
 
 
