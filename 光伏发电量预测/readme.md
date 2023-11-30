@@ -72,7 +72,7 @@ python predict_main.py
 
 
 
-![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231130164329)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%85%89%E4%BC%8F%E5%8F%91%E7%94%B5%E9%87%8F%E9%A2%84%E6%B5%8B/20231130164329.png)
 
 
 
