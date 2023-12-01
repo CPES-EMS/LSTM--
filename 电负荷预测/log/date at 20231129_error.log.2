@@ -1,0 +1,143 @@
+[2023-11-29 21:25:32] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 80 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 73, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+
+[2023-11-29 21:26:52] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 78 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:26:52] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 79 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 72, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+
+[2023-11-29 21:29:27] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 78 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:29:27] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 79 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 72, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+
+[2023-11-29 21:31:14] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 78 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:31:14] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 79 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 67, in <module>
+    data_dict = {'system_id': '3', 'system_name': 'c', 'actual_time': predict_time.reverse()[0][i],
+TypeError: 'NoneType' object is not subscriptable
+
+[2023-11-29 21:31:40] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 78 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:31:40] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 79 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 67, in <module>
+    data_dict = {'system_id': '3', 'system_name': 'c', 'actual_time': predict_time.reverse([0][i]),
+TypeError: reverse() takes no arguments (1 given)
+
+[2023-11-29 21:34:06] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 78 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:34:06] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 79 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 72, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+
+[2023-11-29 21:37:22] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 80 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:37:22] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 81 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 69, in <module>
+    data_dict = {'system_id': '3', 'system_name': 'c', 'actual_time': predict_time[0][i],
+TypeError: 'reversed' object is not subscriptable
+
+[2023-11-29 21:38:21] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 80 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:38:21] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 81 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 74, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+
+[2023-11-29 21:39:17] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 80 - <module>] 插入数据失败, 失败原因为
+[2023-11-29 21:39:17] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 81 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Table 'yuce.your_table' doesn't exist
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 74, in <module>
+    if IsExist(data_dict) > 0:
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 186, in IsExist
+    cursor.execute(query)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1146 (42S02): Table 'yuce.your_table' doesn't exist
+

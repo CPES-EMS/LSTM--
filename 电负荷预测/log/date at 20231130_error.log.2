@@ -1,0 +1,117 @@
+[2023-11-30 07:45:40] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 82 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 07:45:40] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 83 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 72, in <module>
+    'forcast_value': predictions[i], 'forcast_type': '24'}
+TypeError: 'NoneType' object is not subscriptable
+
+[2023-11-30 07:47:02] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 83 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 07:47:02] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 84 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 73, in <module>
+    'forcast_value': predictions[i], 'forcast_type': '24'}
+TypeError: 'NoneType' object is not subscriptable
+
+[2023-11-30 07:47:29] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 83 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 07:47:29] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 84 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 73, in <module>
+    'forcast_value': predictions[i], 'forcast_type': '24'}
+TypeError: 'list_reverseiterator' object is not subscriptable
+
+[2023-11-30 07:49:14] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 82 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 07:49:14] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 83 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'load_time' in 'where clause'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 77, in <module>
+    UpdateData(table_name='sheet3', data_dict=data_dict, system_name='c', system_id='3',
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 166, in UpdateData
+    cursor.execute(sql, data + [load_time, system_name, system_id])
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'load_time' in 'where clause'
+
+[2023-11-30 07:50:07] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 82 - <module>] 插入数据失败, 失败原因为
+[2023-11-30 07:50:07] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 83 - <module>] Traceback (most recent call last):
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 639, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'load_time' in 'where clause'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 77, in <module>
+    UpdateData(table_name='sheet3', data_dict=data_dict, system_name='c', system_id='3',
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\sql_lstm.py", line 166, in UpdateData
+    cursor.execute(sql, data + [load_time, system_name, system_id])
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\cursor_cext.py", line 330, in execute
+    result = self._cnx.cmd_query(
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 77, in wrapper
+    return method(cnx, *args, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\mysql\connector\connection_cext.py", line 647, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'load_time' in 'where clause'
+
+[2023-11-30 08:38:44] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:38:44] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 46, in <module>
+    raw_data = df + raw_data2
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\ops\common.py", line 81, in new_method
+    return method(self, other)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\arraylike.py", line 186, in __add__
+    return self._arith_method(other, operator.add)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 7457, in _arith_method
+    new_data = self._dispatch_frame_op(other, op, axis=axis)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 7496, in _dispatch_frame_op
+    bm = self._mgr.operate_blockwise(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\internals\managers.py", line 1545, in operate_blockwise
+    return operate_blockwise(self, other, array_op)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\internals\ops.py", line 63, in operate_blockwise
+    res_values = array_op(lvals, rvals)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\ops\array_ops.py", line 224, in arithmetic_op
+    res_values = op(left, right)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\arrays\datetimelike.py", line 1993, in __array_ufunc__
+    return super().__array_ufunc__(ufunc, method, *inputs, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\arrays\base.py", line 1686, in __array_ufunc__
+    return arraylike.default_array_ufunc(self, ufunc, method, *inputs, **kwargs)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\arraylike.py", line 489, in default_array_ufunc
+    return getattr(ufunc, method)(*new_inputs, **kwargs)
+numpy.core._exceptions._UFuncBinaryResolutionError: ufunc 'add' cannot use operands with types dtype('<M8[ns]') and dtype('float64')
+
+[2023-11-30 08:39:22] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:39:22] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 46, in <module>
+    raw_data = df.merge(raw_data2, left_on='datetime', right_on='datetime')
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\frame.py", line 9843, in merge
+    return merge(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 148, in merge
+    op = _MergeOperation(
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 737, in __init__
+    ) = self._get_merge_keys()
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\reshape\merge.py", line 1203, in _get_merge_keys
+    right_keys.append(right._get_label_or_level_values(rk))
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\generic.py", line 1778, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'datetime'
+
+[2023-11-30 08:54:49] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:54:49] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 41, in <module>
+    df = pd.concat(df, raw_data2_re, axis=1)
+TypeError: concat() takes 1 positional argument but 2 positional arguments (and 1 keyword-only argument) were given
+
+[2023-11-30 08:55:09] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为
+[2023-11-30 08:55:09] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 50 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py", line 41, in <module>
+    df = df.concat(raw_data2_re, axis=1)
+  File "E:\conda\envs\pytorch\lib\site-packages\pandas\core\generic.py", line 5989, in __getattr__
+    return object.__getattribute__(self, name)
+AttributeError: 'DataFrame' object has no attribute 'concat'
+
+[2023-11-30 08:57:07] [error] [C:\Users\Lenovo\PycharmProjects\光伏功率预测\predict_main.py - 49 - <module>] 读取失败，失败原因为

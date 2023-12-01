@@ -1,0 +1,12 @@
+[2023-11-27 09:05:42] [error] [C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_prediction.py - 156 - <module>] 训练失败，失败原因为
+[2023-11-27 09:05:42] [error] [C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_prediction.py - 157 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_prediction.py", line 143, in <module>
+    for batch_num, (x, label) in enumerate(Lstm_train_dataloader):  # 遍历训练数据加载器
+NameError: name 'Lstm_train_dataloader' is not defined
+
+[2023-11-27 21:38:52] [error] [C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_train.py - 151 - <module>] 训练失败，失败原因为
+[2023-11-27 21:38:52] [error] [C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_train.py - 152 - <module>] Traceback (most recent call last):
+  File "C:\Users\Lenovo\PycharmProjects\pythonProject\LSTM_train.py", line 138, in <module>
+    for batch_num, (x, label) in enumerate(Lstm_train_dataloader):  # 遍历训练数据加载器
+NameError: name 'Lstm_train_dataloader' is not defined
+
