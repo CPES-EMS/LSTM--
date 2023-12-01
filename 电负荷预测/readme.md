@@ -58,7 +58,7 @@ python predict_main.py
 
   
 
-  ![20231201092152](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231201092152.png)
+  ![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231201092152.png)
 
   
 
@@ -68,7 +68,7 @@ python predict_main.py
 
 
 
-![20231130155956](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231130155956.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231201092152.png)
 
 
 
