@@ -68,14 +68,14 @@ python predict_main.py
 
 
 
-![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231201092152.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231201092138.png)
 
 
 
-![20231130164329](C:\Users\Lenovo\PycharmProjects\光伏发电量预测\20231130164329.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231201095020.png)
 
 
 
 ## 5、代码所支撑的前端页面
 
-![20231129145338](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\FileRecv\MobileFile\20231129145338.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E7%94%B5%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231129145338.png)
