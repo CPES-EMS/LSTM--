@@ -56,11 +56,11 @@ python predict_main.py
 
   
 
-  ![20231202172730](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231202172730.png)
+  ![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%86%B7%EF%BC%88%E7%83%AD%EF%BC%89%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231202172730.png)
 
   
 
-  ![20231202172723](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231202172723.png)
+  ![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%86%B7%EF%BC%88%E7%83%AD%EF%BC%89%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231202172723.png)
   
   
 
@@ -70,14 +70,14 @@ python predict_main.py
 
 
 
-![20231202173124](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231202173124.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%86%B7%EF%BC%88%E7%83%AD%EF%BC%89%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231202172724.png)
 
 
 
-![20231202173731](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\Image\SharePic\20231202173731.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%86%B7%EF%BC%88%E7%83%AD%EF%BC%89%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231202173731.png)
 
 
 
 ## 5、代码所支撑的前端页面
 
-![20231129145359](C:\Users\Lenovo\OneDrive\文档\Tencent Files\1609337396\FileRecv\MobileFile\20231129145359.png)
+![image](https://github.com/CPES-EMS/LSTM--/blob/main/%E5%86%B7%EF%BC%88%E7%83%AD%EF%BC%89%E8%B4%9F%E8%8D%B7%E9%A2%84%E6%B5%8B/20231129145359.png)
