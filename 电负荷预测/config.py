@@ -17,17 +17,19 @@ hidden_size = 128  # 隐层维度
 output_size = 1  # 模型输出维度
 
 """数据库信息"""
-dataaddress="rm-2ze568o4qd438xw6cdo.mysql.rds.aliyuncs.com"  # 数据库主机地址
-port_num="3306"  # 数据库端口号
-user_name="yuce"  # 数据库用户名
-password="yuce@123456"  # 数据库密码
-datause="yuce"
+dataaddress="123.249.70.226"  # 数据库主机地址
+port_num="7047"  # 数据库端口号
+user_name="root"  # 数据库用户名
+password="ems123@4"  # 数据库密码
+datause="ems"
 
 """数据库对接表"""
-test_sheet = "ems_els_new_energy_electricity_forecast"
-output_sheet = "ems_els_new_energy_electricity_forecast"
+hvac_sheet = "ems_hvac_history"
+els_sheet = "ems_els_history"
+hydrogen_sheet = "ems_hydrogen_history"
+output_sheet = "ems_els_electric_load_forecast"
 
 """关口信息"""
-area_id_1 = "DBC0441E15FDJ_310"
-area_id_2 = "EAB020A_05B___302"
-area_id_3 = "EAA050A222B___302"
+area_id_1 = ""
+area_id_2 = ""
+area_id_3 = ""
