@@ -8,15 +8,16 @@ from config import *
 import mysql.connector
 
 
-def GetAllDataFromDB(position_name, position_id, device_name, device_id, system_name, system_id, row_name,
+def GetAllDataFromDB(position_name, device_name, system_name, system_id, row_name,
                      table_name, time='load_time', start_time=None):
+    if len(position_name) == 0 or len(device_name) == 0 or len(system_name) == 0 or len(system_id) == 0 \
+            or row_name == False or table_name == False or time == False:
+        raise ValueError("参数不能为空")
     """
     :param system_name:系统名称
     :param system_id:系统id
     :param position_name:采集点名称
-    :param position_id:采集点id
     :param device_name: 设备名称
-    :param device_id: 设备id
     :param row_name: 要选取的列名
     :param table_name: 表名
     :param time: 表中时间列的实际时间
@@ -34,8 +35,8 @@ def GetAllDataFromDB(position_name, position_id, device_name, device_id, system_
 
     # if start_time is not None: sql = f"SELECT {row_name} FROM {table_name} WHERE system_id ='{system_id}' AND {
     # time} >= '{start_time}' ORDER BY {time} DESC LIMIT 3" else:
-    sql = f"SELECT {row_name} FROM {table_name} WHERE position_name='{position_name}' AND position_id ='{position_id}' AND device_name='{device_name}' " \
-          f"AND device_id='{device_id}' AND system_id ='{system_id}'AND system_name='{system_name}' ORDER BY {time} DESC "
+    sql = f"SELECT {row_name} FROM {table_name} WHERE position_name='{position_name}' AND device_name='{device_name}' " \
+          f"AND system_id ='{system_id}'AND system_name='{system_name}' ORDER BY {time} DESC "
     cursor.execute(sql)
 
     data = pd.DataFrame(cursor.fetchall(), columns=[row_name.split(",")])
@@ -45,15 +46,16 @@ def GetAllDataFromDB(position_name, position_id, device_name, device_id, system_
     return data
 
 
-def GetNearestDataFromDB(position_name, position_id, device_name, device_id, system_name, system_id, row_name,
+def GetNearestDataFromDB(position_name, device_name, system_name, system_id, row_name,
                          table_name, target_time, time='load_time', start_time=None):
+    if len(position_name) == 0 or len(device_name) == 0 or len(system_name) == 0 or len(system_id) == 0 \
+            or len(row_name) == 0 or len(table_name) == 0 or len(time) == 0 or len(target_time) == 0:
+        raise ValueError("参数不能为空")
     """
     :param system_name:系统名称
     :param system_id:系统id
     :param position_name:采集点名称
-    :param position_id:采集点id
     :param device_name: 设备名称
-    :param device_id: 设备id
     :param row_name: 要选取的列名
     :param table_name: 表名
     :param time: 表中时间列的定义名称，默认为“create_time”
@@ -70,8 +72,8 @@ def GetNearestDataFromDB(position_name, position_id, device_name, device_id, sys
     )
     cursor = mydb.cursor()
 
-    sql = f"SELECT {row_name} FROM {table_name} WHERE position_name='{position_name}' AND position_id ='{position_id}' AND device_name='{device_name}' " \
-          f"AND device_id='{device_id}' AND system_id ='{system_id}'AND system_name='{system_name}' " \
+    sql = f"SELECT {row_name} FROM {table_name} WHERE position_name='{position_name}' AND device_name='{device_name}' " \
+          f"AND system_id ='{system_id}'AND system_name='{system_name}' " \
           f"ORDER BY ABS(TIMESTAMPDIFF(SECOND, {time}, '{target_time}')) ASC "
     cursor.execute(sql)
     data = pd.DataFrame(cursor.fetchall(), columns=[row_name.split(",")])
@@ -82,6 +84,8 @@ def GetNearestDataFromDB(position_name, position_id, device_name, device_id, sys
 
 
 def InsertData(table_name, data_dict):
+    if not all([table_name, data_dict]):
+        raise ValueError("参数不能为空")
     """
     :param table_name: 插入的表名称
     :param data_dict: 插入表中的数据，字典类型，key是数据库列名,value是相应的列对应的值。
@@ -100,7 +104,7 @@ def InsertData(table_name, data_dict):
     write_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # 生成列名
-    column_name = 'forcast_time'
+    column_name = 'forecast_time'
     data = [write_time]
     for key in data_dict.keys():
         column_name = column_name + ',' + str(key)
@@ -120,9 +124,12 @@ def InsertData(table_name, data_dict):
     mydb.close()
 
 
-def UpdateData(table_name, data_dict, system_name, system_id, load_time):
+def UpdateData(table_name, data_dict, system_name, system_id, actual_time):
+    if len(system_name) == 0 or len(system_id) == 0 or data_dict == False \
+            or table_name == False or actual_time == False:
+        raise ValueError("参数不能为空")
     """
-    :param load_time:
+    :param actual_time:
     :param system_id:系统id
     :param system_name:系统名称
     :param table_name: 插入的表名称
@@ -142,7 +149,7 @@ def UpdateData(table_name, data_dict, system_name, system_id, load_time):
     write_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # 生成列名
-    column_names = ['forcast_time']
+    column_names = ['forecast_time']
     data = [write_time]
     for key in data_dict.keys():
         column_names.append(str(key))
@@ -160,15 +167,27 @@ def UpdateData(table_name, data_dict, system_name, system_id, load_time):
 
     set_statements = ", ".join([column_name + " = %s" for column_name in column_names])
     sql = """UPDATE """ + table_name + """
-             SET """ + set_statements + """ WHERE load_time = %s AND system_name = %s AND system_id = %s;"""
+             SET """ + set_statements + """ WHERE actual_time = %s AND system_name = %s AND system_id = %s;"""
 
     # 执行sql语句
-    cursor.execute(sql, data + [load_time, system_name, system_id])
+    cursor.execute(sql, data + [actual_time, system_name, system_id])
     mydb.commit()
     mydb.close()
 
 
-def IsExist(data_dict):
+def GetPredictDataFromDB(row_name, table_name, actual_time, system_id, system_name, forecast_type):
+    if len(system_name) == 0 or len(system_id) == 0 or len(forecast_type) == 0 \
+            or row_name == False or table_name == False or actual_time == False:
+        raise ValueError("参数不能为空")
+    """
+    :param forecast_type 预测类型
+    :param system_name:地区名
+    :param row_name:要选取的列名
+    :param table_name:表名
+    :param system_id:表中tag_id名称
+    :param actual_time:表中时间列名称
+    :return:
+    """
     mydb = mysql.connector.connect(
         host=dataaddress,  # 数据库主机地址
         port=port_num,
@@ -177,16 +196,11 @@ def IsExist(data_dict):
         database=datause
     )
     cursor = mydb.cursor()
-    # 构建 SELECT 查询语句
-    query = "SELECT COUNT(*) FROM sheet3 WHERE "
-    for key, value in data_dict.items():
-        query += f"{key}='{value}' AND "
-    query = query[:-5]
-    # 执行查询，并获取查询结果
-    cursor.execute(query)
-    result = cursor.fetchone()[0]
+    sql = f"SELECT {row_name} FROM {table_name} WHERE system_id='{system_id}' AND forecast_type='{forecast_type}' AND system_name='{system_name}' ORDER BY {actual_time} DESC"
+    cursor.execute(sql)
+    data = pd.DataFrame(np.array(cursor.fetchall()))
     mydb.close()
-    return result
+    return data
 
 
 if __name__ == '__main__':
@@ -224,5 +238,5 @@ if __name__ == '__main__':
         actual_time = str(row['actual_time'])
         region_id = str(row['region_id'])
         pre_sys_name = str(row['pre_sys_name'])
-        UpdateData(table_name=test_sheet, data_dict=replace_data_list[index], pre_sys_name='光伏', region_name='榆林',
+        UpdateData(table_name=elc_sheet, data_dict=replace_data_list[index], pre_sys_name='光伏', region_name='榆林',
                    region_id=region_id, actual_time=actual_time)
