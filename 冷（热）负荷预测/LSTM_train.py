@@ -28,7 +28,7 @@ class MyDataset(Dataset):
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = 24  # 滑动步长
+        self.window_gap = 24 * 3 # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
         start_index = self.window_gap * index  # 计算起始索引
@@ -114,9 +114,9 @@ if __name__ == "__main__":
     # data = data.drop(['时间'], axis=1)
     try:
         # 调整列的顺序，将新列插入到合适的位置
-        new_order = ['year', 'month', 'day', 'hour', '供暖热负荷(kW)', '电负荷kW', 'weekend', 'weekend_sat',
-                     'winter', 'weekend_sun','summer']
-         # 将"..."替换为原来的列名及其顺序
+        new_order = ['year', 'month', 'day', 'hour', '供暖热负荷(kW)', 'weekend', 'weekend_sat',
+                     'winter', 'weekend_sun', 'summer']
+        # 将"..."替换为原来的列名及其顺序
         data = data[new_order]
     except Exception as e:
         logging.error("数据修改失败")
@@ -148,11 +148,11 @@ if __name__ == "__main__":
     # 实例化模型
     Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)  # 构造 LSTM 模型，将模型放到指定设备上
     # 设置优化器和损失函数
-    optimizer = torch.optim.AdamW(Lstm_Net.parameters(), lr=0.001, weight_decay=0.01)  # 使用 AdamW 优化器
+    optimizer = torch.optim.AdamW(Lstm_Net.parameters(), lr=0.0015, weight_decay=0.01)  # 使用 AdamW 优化器
     # 使用smooth误差损失函数
     criterion = nn.SmoothL1Loss()
     # 定义余弦退火学习率调整器
-    scheduler = CosineAnnealingLR(optimizer, T_max=100, eta_min=0.001)
+    scheduler = CosineAnnealingLR(optimizer, T_max=10000, eta_min=0.0005)
 
     # 初始化列表来存储训练和验证损失
     train_losses = []  # 训练损失列表
@@ -171,7 +171,7 @@ if __name__ == "__main__":
                 optimizer.zero_grad()  # 清空梯度
                 loss.backward()  # 反向传播计算梯度
                 # 设置梯度阈值
-                torch.nn.utils.clip_grad_norm_(Lstm_Net.parameters(), max_norm=0.01)
+                torch.nn.utils.clip_grad_norm_(Lstm_Net.parameters(), max_norm=0.1)
                 optimizer.step()  # 更新模型参数
         except Exception as e:
             logging.error("训练失败，失败原因为")
@@ -186,7 +186,7 @@ if __name__ == "__main__":
     try:
         logging.info("保存模型参数")
         # 将模型的参数保存到文件中，文件名为 model.pt
-        torch.save(Lstm_Net.state_dict(), "./output_results/model_4h1.pt")
+        torch.save(Lstm_Net.state_dict(), "./output_results/model_24h.pt")
     except Exception as e:
         logging.error("保存失败，失败原因为")
         logging.error(traceback.format_exc())
