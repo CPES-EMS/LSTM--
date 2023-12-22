@@ -12,7 +12,7 @@ import torch
 from LSTM_train import MyDataset
 
 Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)  # 构造 LSTM 模型，将
-Lstm_Net.load_state_dict(torch.load("./output_results/model_4h1.pt"))  # 加载模型参数
+Lstm_Net.load_state_dict(torch.load("./output_results/model_24h.pt"))  # 加载模型参数
 
 try:
     logging.info("读入数据")
@@ -65,8 +65,8 @@ plt.figure()
 # x_tick_labels = ['7', '8', '9', '10']
 try:
     logging.info("绘制图形")
-    plt.plot(labels[0].flatten(), label='True Data')
-    plt.plot(predictions[0].flatten(), label='Predictions')
+    plt.plot(labels.flatten(), label='True Data')
+    plt.plot(predictions.flatten(), label='Predictions')
 except Exception as e:
     logging.error("绘制失败，失败原因为")
     logging.error(traceback.format_exc())
@@ -94,4 +94,6 @@ except Exception as e:
     logging.error("保存失败，失败原因为")
     logging.error(traceback.format_exc())
     raise e
+finally:
+    df_predictions.close()
 logging.info("结果保存成功")
