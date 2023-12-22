@@ -23,6 +23,7 @@ except Exception as e:
     logging.error(traceback.format_exc())
     raise e
 logging.info("数据读取成功")
+
 try:
     logging.info("构建验证数据集")
     test_data = data[int(len(data) * 0.78):]  # 选择最后 window_input_size 条数据作为测试数据
