@@ -5,8 +5,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from torch import nn
 from torch.utils.data import DataLoader
-from config import input_size, hidden_size, output_size, window_label_size, device, logging, window_input_size, \
-    batch_size
+from config import input_size, hidden_size, output_size, window_label_size, device, logging, window_input_size
 from model import LstmNet
 import torch
 from LSTM_train import MyDataset
@@ -18,17 +17,18 @@ try:
     logging.info("读入数据")
     # 预测数据
     filepath = './handled_data/PV_train_time1.csv'
-    data = pd.read_csv(filepath, encoding="utf-8")
+    data = pd.read_csv(filepath, encoding="gbk")
 except Exception as e:
     logging.error("读取数据失败, 失败原因为")
     logging.error(traceback.format_exc())
     raise e
 logging.info("数据读取成功")
+
 try:
     logging.info("构建验证数据集")
-    test_data = data[int(len(data) * 0.80):]  # 选择最后 window_input_size 条数据作为测试数据
+    test_data = data[int(len(data) * 0.78):]  # 选择最后 window_input_size 条数据作为测试数据
     test_dataset = MyDataset(test_data, window_input_size, window_label_size)  # 构造测试数据集
-    test_dataloader = DataLoader(test_dataset, batch_size, shuffle=False)  # 构造测试数据加载器
+    test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)  # 构造测试数据加载器
 except Exception as e:
     logging.error("构建失败，失败原因为")
     logging.error(traceback.format_exc())
@@ -74,7 +74,7 @@ except Exception as e:
 logging.info("绘制成功")
 # plt.xticks(x_ticks, x_tick_labels)
 plt.xlabel('Time(h)')
-plt.ylabel('Gen(KWh)')
+plt.ylabel('Power(KW)')
 plt.legend()
 plt.savefig("./output_results/data_comparison.png")  # 保存图像
 plt.show()
