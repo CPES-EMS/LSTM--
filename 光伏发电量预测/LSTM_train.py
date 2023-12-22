@@ -23,12 +23,14 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 
 class MyDataset(Dataset):
     def __init__(self, data, window_input_size, window_label_size):
+
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = 8  # 滑动步长
+        self.window_gap = 24  # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
+
         start_index = self.window_gap * index  # 计算起始索引
         end_index = start_index + self.window_input_size + self.window_label_size  # 计算结束索引
         window_input = torch.tensor(  # 构造输入 Tensor
@@ -62,6 +64,7 @@ if __name__ == "__main__":
         logging.error(traceback.format_exc())
         raise e
     logging.info("数据读取成功")
+
     try:
         logging.info("时间列转换")
         data['时间'] = pd.to_datetime(data['时间'])
@@ -79,7 +82,7 @@ if __name__ == "__main__":
     data = data.drop(['时间'], axis=1)
     try:
         # 调整列的顺序，将新列插入到合适的位置
-        new_order = ['year', 'month', 'day', 'hour', '发电量', '光照强度', '温度',
+        new_order = ['year', 'month', 'day', 'hour', '功率', '温度',
                      '湿度']  # 将"..."替换为原来的列名及其顺序
         data = data[new_order]
     except Exception as e:
@@ -96,7 +99,7 @@ if __name__ == "__main__":
         raise e
     logging.info("新数据集存储成功")
     # 划分训练集和验证集
-    train_data = data[: int(len(data) * 0.79)]  # 前 80% 的数据作为训练集
+    train_data = data[: int(len(data) * 0.78)]  # 前 80% 的数据作为训练集
     try:
         logging.info("构建训练数据集")
         # 创建训练集和验证集的数据集和数据加载器
