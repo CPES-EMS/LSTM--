@@ -8,6 +8,7 @@ logging = TNLog(dir='log', name='date at ' + time.strftime('%Y%m%d', time.localt
 # 定义参数
 window_input_size = 24 * 16  # 输入窗口大小，即用多少小时的数据来预测未来
 window_label_size = 24  # 输出窗口大小，即预测未来多少个小时的数据
+window_gap_size = 24*3
 epoch = 12000  # 训练轮数
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")  # 设置设备类型，如果有 GPU 则使用 GPU，否则使用 CPU
 batch_size = 16  # 批量大小,一次训练的样本数
