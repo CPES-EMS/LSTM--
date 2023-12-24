@@ -2,7 +2,7 @@ import os  # 导入 os 库，用于处理文件路径
 import math
 import traceback
 from config import logging, window_input_size, window_label_size, batch_size, input_size, hidden_size, output_size, \
-    device, epoch
+    device, epoch, window_gap_size
 import pandas as pd  # 导入 Pandas 库，用于数据处理
 import torch  # 导入 PyTorch 库
 import torch.nn as nn  # 导入 PyTorch 库中的神经网络模块，用于定义损失函数等
@@ -27,7 +27,7 @@ class MyDataset(Dataset):
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = 24  # 滑动步长
+        self.window_gap = window_gap_size  # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
 
