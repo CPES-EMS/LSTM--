@@ -14,7 +14,7 @@ import pandas as pd
 import torch
 import numpy as np
 
-Lstm_Net.load_state_dict(torch.load("./output_results/model.pt"))  # 加载模型参数
+Lstm_Net.load_state_dict(torch.load("./output_results/model_24h.pt"))  # 加载模型参数
 mydb = mysql.connector.connect(
     host=dataaddress,  # 数据库主机地址
     port=port_num,
