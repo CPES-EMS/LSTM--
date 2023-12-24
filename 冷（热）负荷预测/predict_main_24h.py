@@ -110,7 +110,7 @@ logging.info("读取成功")
 print(raw_data1)
 
 # 对读取数据进行修改
-raw_data1 = raw_data1.iloc[-4:, :]
+raw_data1 = raw_data1.iloc[-24:, :]
 time_before = raw_data1['datetime']
 time_before = time_before.reset_index(drop=True)
 new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
@@ -127,7 +127,7 @@ output = Lstm_Net(data_tensor)  # 根据模型预测结果
 # output = output[-window_label_size:, :]  # 取输出序列中最后的 window_label_size 个时间步
 predictions = output.detach().cpu().numpy()  # 保存预测数据
 
-predict_time = [(time_before + timedelta(hours=4))]
+predict_time = [(time_before + timedelta(hours=24))]
 predictions = [inner_list[0] for outer_list in predictions for inner_list in outer_list]
 for i in range(len(predictions)):
     predictions[i] = predictions[i].astype(float)
@@ -137,9 +137,9 @@ print(predictions)
 
 try:
     logging.info("插入数据")
-    for i in range(4):
+    for i in range(24):
         data_dict = {'area_id': '10', 'area_name': '供暖热负荷', 'actual_time': predict_time[0][i],
-                     'forecast_value': predictions[i], 'forecast_type': '4'}
+                     'forecast_value': predictions[i], 'forecast_type': '24'}
         print(data_dict)
         # 读取现有预测数据
         predict_data_ori = np.array(
