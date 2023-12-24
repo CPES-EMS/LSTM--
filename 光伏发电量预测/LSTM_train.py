@@ -27,7 +27,7 @@ class MyDataset(Dataset):
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = 24  # 滑动步长
+        self.window_gap = window_gap_size   # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
 
