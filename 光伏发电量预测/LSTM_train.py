@@ -2,7 +2,7 @@ import os  # 导入 os 库，用于处理文件路径
 import math
 import traceback
 from config import logging, window_input_size, window_label_size, batch_size, input_size, hidden_size, output_size, \
-    device, epoch
+    device, epoch, window_gap_size 
 import pandas as pd  # 导入 Pandas 库，用于数据处理
 import torch  # 导入 PyTorch 库
 import torch.nn as nn  # 导入 PyTorch 库中的神经网络模块，用于定义损失函数等
