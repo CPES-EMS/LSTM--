@@ -2,7 +2,6 @@ import mysql.connector
 import datetime
 from datetime import datetime
 import traceback
-from update import *
 from pydantic.datetime_parse import timedelta
 
 from LSTM_validation import Lstm_Net
