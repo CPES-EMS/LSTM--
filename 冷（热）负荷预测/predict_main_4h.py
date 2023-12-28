@@ -143,6 +143,8 @@ new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_s
                      'winter', 'weekend_sun', 'summer']
 raw_data1 = raw_data1[new_order]
 raw_data1 = raw_data1.iloc[:, 1:]
+# 解决单位不统一
+raw_data1['load_value'] = raw_data1['load_value'] * 1000
 print(raw_data1)
 
 # 调用模型进行预测
