@@ -1,9 +1,10 @@
+import sys
+
 import mysql.connector
 import datetime
-from datetime import datetime
+import warnings
+from datetime import timedelta
 import traceback
-
-from pydantic.datetime_parse import timedelta
 
 from LSTM_validation import Lstm_Net
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, dataaddress, \
@@ -37,6 +38,10 @@ try:
                                       table_name=els_sheet,
                                       time='load_time',
                                       start_time=None)
+        if temp_data1.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
+
         if i == 0:
             raw_data1['load_time'] = temp_data1['load_time']
             raw_data1[i] = temp_data1['load_value']
@@ -45,10 +50,38 @@ try:
 
     # 求和得到总的光伏功率
     raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
+    # 对读入数据展平并转化为Series对象
+    load_time = raw_data1['load_time'].values.flatten()
+    load_value = raw_data1['load_value'].values.flatten()
+    # 对异常值进行处理
+    processed_data = []  # 存储处理后的数据
+    for i in range(len(load_value)):
+        if load_value[i] < -100:
+            processed_data.append(load_value[i - 1])
+        elif load_value[i] > 100000:
+            processed_data.append(load_value[i - 1])
+        else:
+            processed_data.append(load_value[i])
+    processed_data = np.array(processed_data)
+    raw_data1 = pd.DataFrame()
+    raw_data1['load_time'] = load_time
+    raw_data1['load_value'] = processed_data
+    # 按时间分组并求均值
+    raw_data1 = raw_data1.groupby('load_time', as_index=False, sort=True).mean()
+
     order = ['load_time', 'load_value']
     raw_data1 = raw_data1[order]
-    raw_data1 = raw_data1[::-1]
     raw_data1 = raw_data1.reset_index(drop=True)
+
+except Exception as e:
+    logging.error("读取失败，失败原因为")
+    logging.error(traceback.format_exc())
+    raise e
+finally:
+    mydb.close()
+logging.info("读取成功")
+
+try:
 
     # 从电气系统数据库读入买电量数据
     same_time = raw_data1['load_time']
@@ -62,18 +95,43 @@ try:
                                           system_id='0106', row_name=','.join(raw_name2),
                                           table_name=els_sheet,
                                           time='load_time',
-                                          start_time=None).drop_duplicates()
+                                          start_time=None)
+
+        if temp_data2.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
         # 对读入数据展平并转化为Series对象
         load_time1 = temp_data2['load_time'].values.flatten()
         load_value1 = temp_data2['load_value'].values.flatten()
+        # 对异常值进行处理
+        processed_data1 = []  # 存储处理后的数据
+        for i in range(len(load_value1)):
+            if load_value1[i] < -100:
+                processed_data1.append(load_value1[i - 1])
+            elif load_value1[i] > 100000:
+                processed_data1.append(load_value1[i - 1])
+            else:
+                processed_data1.append(load_value1[i])
+        processed_data1 = np.array(processed_data1)
         temp_data2 = pd.DataFrame()
         temp_data2['load_time'] = load_time1
-        temp_data2['load_value'] = load_value1
+        temp_data2[j] = processed_data1
         # 按时间分组并求均值
         temp_data2 = temp_data2.groupby('load_time', as_index=False, sort=True).mean()
-        load_value1 = temp_data2['load_value']
-        raw_data1[j] = load_value1.values
+        if temp_data2.shape[0] != raw_data1.shape[0]:
+            warnings.warn("数据样本不统一")
+        raw_data1 = pd.merge(raw_data1, temp_data2, how='outer', on='load_time', sort=True)
+    raw_data1 = raw_data1.fillna(0)
 
+except Exception as e:
+    logging.error("读取失败，失败原因为")
+    logging.error(traceback.format_exc())
+    raise e
+finally:
+    mydb.close()
+logging.info("读取成功")
+
+try:
     # 从氢能系统数据库读入燃料电池数据
     temp_data3 = GetNearestDataFromDB(position_name='系统输出总功率', device_name='氢燃料电池-1号氢燃料电池',
                                       system_name='用氢系统', target_time=same_time,
@@ -81,29 +139,95 @@ try:
                                       table_name=hydrogen_sheet,
                                       time='load_time',
                                       start_time=None)
+    if temp_data3.shape[0] == 0:
+        logging.error("数据库的数据为空")
+        sys.exit(100)
     # 对读入数据展平并转化为Series对象
     load_time2 = temp_data3['load_time'].values.flatten()
     load_value2 = temp_data3['load_value'].values.flatten()
+    # 对异常值进行处理
+    processed_data2 = []  # 存储处理后的数据
+    for i in range(len(load_value2)):
+        if load_value2[i] < -100:
+            processed_data2.append(load_value2[i - 1])
+        elif load_value2[i] > 100000:
+            processed_data2.append(load_value2[i - 1])
+        else:
+            processed_data2.append(load_value2[i])
+    processed_data2 = np.array(processed_data2)
     temp_data3 = pd.DataFrame()
     temp_data3['load_time'] = load_time2
-    temp_data3['load_value'] = load_value2
+    temp_data3[3] = processed_data2
     # 按时间分组并求均值
-    temp_data3 = temp_data3.groupby('load_time', as_index=False, sort=False).mean()
+    temp_data3 = temp_data3.groupby('load_time', as_index=False, sort=True).mean()
     # temp_data3 = temp_data3[:-5]
-    load_value2 = temp_data3['load_value']
-    raw_data1[3] = load_value2.values
+    if temp_data3.shape[0] != raw_data1.shape[0]:
+        warnings.warn("数据样本不统一")
+    raw_data1 = pd.merge(raw_data1, temp_data3, how='outer', on='load_time', sort=True)
+    raw_data1 = raw_data1.fillna(0)
 
-    # 求和得到总的电负荷
+    # 求和得到总的用电
     raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
     order = ['load_time', 'load_value']
     raw_data1 = raw_data1[order]
     print(raw_data1)
 
-    """
-    
-    
-    还需要减去地源热泵和电锅炉的耗电才是电负荷，目前这俩还没有数据，
-    """
+except Exception as e:
+    logging.error("读取失败，失败原因为")
+    logging.error(traceback.format_exc())
+    raise e
+finally:
+    mydb.close()
+logging.info("读取成功")
+
+try:
+    # 从电气系统读入各个设备厂用电数据
+    raw_name3 = ['load_time', 'load_value']
+    position_name_list2 = ['1A7有功功率', '2A4有功功率', '2A5有功功率', '3A6有功功率', '1A4-1地源热泵有功功率']
+    device_name_list2 = ['电锅炉厂用电-1A7', '电锅炉厂用电-2A4', '电锅炉厂用电-2A5', '电锅炉厂用电-3A6', '地源热泵厂用电-1A4-1地源热泵']
+    for k in range(len(position_name_list2)):
+        temp_data4 = GetNearestDataFromDB(position_name=position_name_list2[k],
+                                          device_name=device_name_list2[k],
+                                          system_name='厂用电', target_time=same_time,
+                                          system_id='0107', row_name=','.join(raw_name3),
+                                          table_name=els_sheet,
+                                          time='load_time',
+                                          start_time=None)
+
+        if temp_data4.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
+        # 对读入数据展平并转化为Series对象
+        load_time3 = temp_data4['load_time'].values.flatten()
+        load_value3 = temp_data4['load_value'].values.flatten()
+        # 对异常值进行处理
+        processed_data3 = []  # 存储处理后的数据
+        for i in range(len(load_value3)):
+            if load_value3[i] < -100:
+                processed_data3.append(load_value3[i - 1])
+            elif load_value3[i] > 100000:
+                processed_data3.append(load_value3[i - 1])
+            else:
+                processed_data3.append(load_value3[i])
+        processed_data3 = np.array(processed_data3)
+        temp_data4 = pd.DataFrame()
+        temp_data4['load_time'] = load_time3
+        temp_data4[k] = processed_data3
+        # 按时间分组并求均值
+        temp_data4 = temp_data4.groupby('load_time', as_index=False, sort=True).mean()
+        # if temp_data4.shape[0] != raw_data1.shape[0]:
+        #     warnings.warn("数据样本不统一")
+        raw_data1 = pd.merge(raw_data1, temp_data4, how='outer', on='load_time', sort=True)
+    raw_data1 = raw_data1.fillna(0)
+    print(raw_data1)
+
+    # 求和得到总的耗电量
+    raw_data1['use'] = raw_data1.iloc[:, 2:].sum(axis=1)
+    # 用电量减去耗电量得到总的电负荷
+    raw_data1['load_value'] = raw_data1['load_value'] - raw_data1['use']
+    order = ['load_time', 'load_value']
+    raw_data1 = raw_data1[order]
+    print(raw_data1)
 
 #     # 降采样处理得到间隔为1小时的数据
 #     raw_data1['load_time'] = pd.to_datetime(raw_data1['load_time'])
@@ -153,14 +277,17 @@ logging.info("添加成功")
 print(raw_data)
 
 # 对读取数据进行修改
-raw_data = raw_data.iloc[-4:, :]
+if raw_data.shape[0] <= 24 * 12:
+    raw_data = raw_data
+else:
+    raw_data = raw_data.iloc[-24 * 12:, :]
+
 time_before = raw_data['datetime']
 time_before = time_before.reset_index(drop=True)
 new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
              'weekend_sun']  # 将"..."替换为原来的列名及其顺序
 raw_data = raw_data[new_order]
 raw_data = raw_data.iloc[:, 1:]
-
 
 # 调用模型进行预测
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -171,31 +298,32 @@ output = Lstm_Net(data_tensor)  # 根据模型预测结果
 predictions = output.detach().cpu().numpy()  # 保存预测数据
 
 predict_time = [(time_before + timedelta(hours=4))]
-print(predict_time)
-print(type(predict_time))
+# print(len(predict_time[0]))
 predictions = [inner_list[0] for outer_list in predictions for inner_list in outer_list]
 for i in range(len(predictions)):
     predictions[i] = predictions[i].astype(float)
-print(predictions)
+
 
 # 将预测结果放入数据库
 
 try:
     logging.info("插入数据")
-    for i in range(4):
-        data_dict = {'area_id': '10', 'area_name': '电负荷', 'actual_time': predict_time[0][i],
-                     'forecast_value': predictions[i], 'forecast_type': '4'}
+    for i in range(len(predictions)):
+        data_dict = {'area_id': '10', 'area_name': '电负荷', 'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
+                     'forecast_value': float(predictions[i]), 'forecast_type': '24'}
         print(data_dict)
         # 读取现有预测数据
         predict_data_ori = np.array(
             GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
-                                 area_id='10', area_name='电负荷', forecast_type=data_dict['forecast_type']))
-        cur = data_dict['actual_time']
-        if cur not in predict_data_ori:
-            InsertData(table_name=output_sheet, data_dict=data_dict)
-        else:
-            UpdateData(table_name=output_sheet, data_dict=data_dict, area_name='电负荷', area_id='10',
+                                 area_id='10', area_name='电负荷', forecast_type=data_dict['forecast_type']), dtype='datetime64[D]')
+        cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
+        if np.isin(cur, predict_data_ori):
+            dic = dict()
+            dic['forecast_value'] = data_dict['forecast_value']
+            UpdateData(table_name=output_sheet, data_dict=dic, area_name='电负荷', area_id='10',
                        actual_time=data_dict['actual_time'])
+        else:
+            InsertData(table_name=output_sheet, data_dict=data_dict)
 except Exception as e:
     logging.error("插入数据失败, 失败原因为")
     logging.error(traceback.format_exc())
