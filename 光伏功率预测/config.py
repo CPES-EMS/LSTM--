@@ -1,6 +1,7 @@
 from log_print import TNLog
 import time
 import torch  # 导入 PyTorch 库
+
 """参数设置"""
 
 # 日志记录设置
@@ -35,3 +36,11 @@ output_sheet = "ems_new_energy_load_forecast"
 area_id_1 = ""
 area_id_2 = ""
 area_id_3 = ""
+
+# # 阿里云数据库
+# """数据库信息"""
+# dataaddress = "192.168.3.13"
+# port_num = "3306"
+# user_name = "root"
+# password = "123456"
+# datause = "ems"
