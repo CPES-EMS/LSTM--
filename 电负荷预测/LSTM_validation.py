@@ -12,7 +12,7 @@ import torch
 from LSTM_train import MyDataset
 
 Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)  # 构造 LSTM 模型，将
-Lstm_Net.load_state_dict(torch.load("./output_results/model.pt"))  # 加载模型参数
+Lstm_Net.load_state_dict(torch.load("./output_results/model_4h.pt"))  # 加载模型参数
 
 try:
     logging.info("读入数据")
