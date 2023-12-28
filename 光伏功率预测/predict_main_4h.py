@@ -1,9 +1,8 @@
 import mysql.connector
-import datetime
-from datetime import datetime
+import sys
+import warnings
+from datetime import timedelta
 import traceback
-
-from pydantic.datetime_parse import timedelta
 
 from LSTM_validation import Lstm_Net
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, env_sheet, \
@@ -22,7 +21,6 @@ mydb = mysql.connector.connect(
     database=datause
 )
 
-
 try:
     # 从电气系统数据库读入光伏数据
     row_name1 = ['load_time', 'load_value']
@@ -38,6 +36,9 @@ try:
                                       table_name=els_sheet,
                                       time='load_time',
                                       start_time=None)
+        if temp_data1.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
         if i == 0:
             raw_data1['load_time'] = temp_data1['load_time']
             raw_data1[i] = temp_data1['load_value']
@@ -46,11 +47,38 @@ try:
 
     # 求和得到总的光伏功率
     raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
+    # 对读入数据展平并转化为Series对象
+    load_time = raw_data1['load_time'].values.flatten()
+    load_value = raw_data1['load_value'].values.flatten()
+    # 对异常值进行处理
+    processed_data = []  # 存储处理后的数据
+    for i in range(len(load_value)):
+        if load_value[i] < -100:
+            processed_data.append(load_value[i - 1])
+        elif load_value[i] > 100000:
+            processed_data.append(load_value[i - 1])
+        else:
+            processed_data.append(load_value[i])
+    processed_data = np.array(processed_data)
+    raw_data1 = pd.DataFrame()
+    raw_data1['load_time'] = load_time
+    raw_data1['load_value'] = processed_data
+    # 按时间分组并求均值
+    raw_data1 = raw_data1.groupby('load_time', as_index=False, sort=True).mean()
+
     order = ['load_time', 'load_value']
     raw_data1 = raw_data1[order]
-    raw_data1 = raw_data1[::-1]
     raw_data1 = raw_data1.reset_index(drop=True)
 
+except Exception as e:
+    logging.error("读取失败，失败原因为")
+    logging.error(traceback.format_exc())
+    raise e
+finally:
+    mydb.close()
+logging.info("读取成功")
+
+try:
     same_time = raw_data1['load_time']
     # 从环境系统数据库读入天气预报数据
     position_name_list1 = ['室外温度（单位：℃）', '室外湿度（单位：％）']
@@ -63,28 +91,32 @@ try:
                                           table_name=env_sheet,
                                           time='load_time',
                                           start_time=None)
+        if temp_data2.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
         load_time1 = temp_data2['load_time'].values.flatten()
         load_value1 = temp_data2['load_value'].values.flatten()
         # 对异常值进行处理
         processed_data = []  # 存储处理后的数据
         for i in range(len(load_value1)):
             if load_value1[i] < -100:
-                processed_data.append(load_value1[i-1])
+                processed_data.append(load_value1[i - 1])
+            elif load_value1[i] > 100:
+                processed_data.append(load_value1[i - 1])
             else:
                 processed_data.append(load_value1[i])
         processed_data = np.array(processed_data)
         temp_data2 = pd.DataFrame()
         temp_data2['load_time'] = load_time1
-        temp_data2['load_value'] = processed_data
+        temp_data2[j] = processed_data
         # 按照时间进行排序
         temp_data2 = temp_data2.groupby('load_time', as_index=False, sort=True).mean()
-        """
-        因为数据长度不一样，所以进行裁剪
-        """
-        temp_data2 = temp_data2[:-4]
-        raw_data1[j] = temp_data2['load_value']
+        print(temp_data2)
+        if temp_data2.shape[0] != raw_data1.shape[0]:
+            warnings.warn("数据样本不统一")
+        raw_data1 = pd.merge(raw_data1, temp_data2, how='outer', on='load_time', sort=True)
     raw_data1 = raw_data1.fillna(0)
-    # print(raw_data1)
+    print(raw_data1)
 
     # # 降采样处理得到间隔为1小时的数据
     # raw_data1['load_time'] = pd.to_datetime(raw_data1['load_time'])
@@ -117,14 +149,18 @@ finally:
 logging.info("读取成功")
 
 # 对读取数据进行修改
-raw_data = raw_data.iloc[-4:, :]
+if raw_data.shape[0] <= 4 * 12:
+    raw_data = raw_data
+else:
+    raw_data = raw_data.iloc[-4 * 12:, :]
+
 time_before = raw_data['datetime']
 time_before = time_before.reset_index(drop=True)
 new_order = ['year', 'month', 'day', 'hour', 'load_value', 'temperature',
              'humidity']  # 将"..."替换为原来的列名及其顺序
 raw_data = raw_data[new_order]
 raw_data = raw_data.iloc[:, 1:]
-# print(raw_data)
+print(raw_data)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 data_tensor = torch.tensor(raw_data.values)  # 转换为张量
@@ -143,20 +179,25 @@ for i in range(len(predictions)):
 
 try:
     logging.info("插入数据")
-    for i in range(4):
-        data_dict = {'system_id': '10', 'system_name': '光伏功率', 'actual_time': predict_time[0][i],
-                     'forecast_value': predictions[i], 'forecast_type': '4'}
+    for i in range(len(predictions)):
+        data_dict = {'system_id': '10', 'system_name': '光伏功率',
+                     'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
+                     'forecast_value': float(predictions[i]), 'forecast_type': '4'}
         print(data_dict)
         # 读取现有预测数据
         predict_data_ori = np.array(
             GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
-                                 system_id='10', system_name='光伏功率', forecast_type=data_dict['forecast_type']))
-        cur = data_dict['actual_time']
-        if cur not in predict_data_ori:
-            InsertData(table_name=output_sheet, data_dict=data_dict)
-        else:
-            UpdateData(table_name=output_sheet, data_dict=data_dict, system_name='光伏功率', system_id='10',
+                                 system_id='10', system_name='光伏功率', forecast_type=data_dict['forecast_type']), dtype='datetime64[D]')
+
+        cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
+        # print(type(cur))
+        if np.isin(cur, predict_data_ori):
+            dic = dict()
+            dic['forecast_value'] = data_dict['forecast_value']
+            UpdateData(table_name=output_sheet, data_dict=dic, system_name='光伏功率', system_id='10',
                        actual_time=data_dict['actual_time'])
+        else:
+            InsertData(table_name=output_sheet, data_dict=data_dict)
 except Exception as e:
     logging.error("插入数据失败, 失败原因为")
     logging.error(traceback.format_exc())
