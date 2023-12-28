@@ -1,9 +1,8 @@
 import mysql.connector
-import datetime
-from datetime import datetime
+import warnings
+import sys
+from datetime import timedelta
 import traceback
-
-from pydantic.datetime_parse import timedelta
 
 from LSTM_validation import Lstm_Net
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, dataaddress, \
@@ -35,6 +34,9 @@ try:
                                       time='load_time',
                                       start_time=None)
 
+        if temp_data1.shape[0] == 0:
+            logging.error("数据库的数据为空")
+            sys.exit(100)
         if i == 0:
             raw_data1['load_time'] = temp_data1['load_time']
             raw_data1[i] = temp_data1['load_value']
@@ -43,10 +45,30 @@ try:
 
     # 求和得到总的热负荷
     raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
+    # 对读入数据展平并转化为Series对象
+    load_time = raw_data1['load_time'].values.flatten()
+    load_value = raw_data1['load_value'].values.flatten()
+    # 对异常值进行处理
+    processed_data = []  # 存储处理后的数据
+    for i in range(len(load_value)):
+        if load_value[i] < -100:
+            processed_data.append(load_value[i - 1])
+        elif load_value[i] > 100:
+            processed_data.append(load_value[i - 1])
+        else:
+            processed_data.append(load_value[i])
+    processed_data = np.array(processed_data)
+    raw_data1 = pd.DataFrame()
+    raw_data1['load_time'] = load_time
+    raw_data1['load_value'] = processed_data
+    # 按时间分组并求均值
+    raw_data1 = raw_data1.groupby('load_time', as_index=False, sort=True).mean()
+
     order = ['load_time', 'load_value']
     raw_data1 = raw_data1[order]
-    raw_data1 = raw_data1[::-1]
     raw_data1 = raw_data1.reset_index(drop=True)
+    raw_data1 = raw_data1.fillna(0)
+    print(raw_data1)
 
 except Exception as e:
     logging.error("读取失败，失败原因为")
@@ -110,7 +132,11 @@ logging.info("读取成功")
 print(raw_data1)
 
 # 对读取数据进行修改
-raw_data1 = raw_data1.iloc[-24:, :]
+if raw_data1.shape[0] <= 24 * 12:
+    raw_data1 = raw_data1
+else:
+    raw_data1 = raw_data1.iloc[-24 * 12:, :]
+
 time_before = raw_data1['datetime']
 time_before = time_before.reset_index(drop=True)
 new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
@@ -137,20 +163,22 @@ print(predictions)
 
 try:
     logging.info("插入数据")
-    for i in range(24):
-        data_dict = {'area_id': '10', 'area_name': '供暖热负荷', 'actual_time': predict_time[0][i],
-                     'forecast_value': predictions[i], 'forecast_type': '24'}
+    for i in range(len(predictions)):
+        data_dict = {'area_id': '10', 'area_name': '供暖热负荷', 'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
+                     'forecast_value': float(predictions[i]), 'forecast_type': '24'}
         print(data_dict)
         # 读取现有预测数据
         predict_data_ori = np.array(
             GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
-                                 area_id='10', area_name='供暖热负荷', forecast_type=data_dict['forecast_type']))
-        cur = data_dict['actual_time']
-        if cur not in predict_data_ori:
-            InsertData(table_name=output_sheet, data_dict=data_dict)
-        else:
-            UpdateData(table_name=output_sheet, data_dict=data_dict, area_name='供暖热负荷', area_id='10',
+                                 area_id='10', area_name='供暖热负荷', forecast_type=data_dict['forecast_type']), dtype='datetime64[D]')
+        cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
+        if np.isin(cur, predict_data_ori):
+            dic = dict()
+            dic['forecast_value'] = data_dict['forecast_value']
+            UpdateData(table_name=output_sheet, data_dict=dic, area_name='供暖热负荷', area_id='10',
                        actual_time=data_dict['actual_time'])
+        else:
+            InsertData(table_name=output_sheet, data_dict=data_dict)
 except Exception as e:
     logging.error("插入数据失败, 失败原因为")
     logging.error(traceback.format_exc())
