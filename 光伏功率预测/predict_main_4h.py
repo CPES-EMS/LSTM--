@@ -23,14 +23,15 @@ mydb = mysql.connector.connect(
 
 
 def get_data1():
+    raw_data1 = pd.DataFrame()
     state = 0
     try:
         # 从电气系统数据库读入光伏数据
         row_name1 = ['load_time', 'load_value']
         device_name_list = ['DC/DC-1号DC/DC', 'DC/DC-2号DC/DC', 'DC/DC-3号DC/DC', 'DC/DC-4号DC/DC',
                             'DC/DC-5号DC/DC', 'DC/DC-6号DC/DC']
-        position_name_list = ['1#总功率', '2#总功率', '3#总功率', '4#总功率', '5#总功率', '6#总功率']
-        raw_data1 = pd.DataFrame()
+        position_name_list = ['1#总功率', '2#总功率', '3#总功率',
+                              '4#总功率', '5#总功率', '6#总功率']
         for i in range(0, len(device_name_list)):
             temp_data1 = GetAllDataFromDB(position_name=position_name_list[i],
                                           device_name=device_name_list[i],
@@ -76,10 +77,10 @@ def get_data1():
             logging.error('全部光伏设备数据为空')
             raw_data1 = pd.DataFrame()
             state = 100
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
@@ -87,6 +88,7 @@ def get_data1():
 
 
 def get_data2(raw_data1):
+    state = 0
     try:
         same_time = raw_data1['load_time']
         row_name1 = ['load_time', 'load_value']
@@ -120,21 +122,22 @@ def get_data2(raw_data1):
                 temp_data2[j] = processed_data
                 # 按照时间进行排序
                 temp_data2 = temp_data2.groupby('load_time', as_index=False, sort=True).mean()
-                print(temp_data2)
+
                 if temp_data2.shape[0] != raw_data1.shape[0]:
-                    warnings.warn("数据样本不统一")
+
+                    logging.error("数据样本不统一")
                 raw_data1 = pd.merge(raw_data1, temp_data2, how='outer', on='load_time', sort=True)
             else:
                 logging.error('部分环境设备数据为空')
         raw_data1 = raw_data1.fillna(0)
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
-    return raw_data1
+    return raw_data1, state
 
     # # 降采样处理得到间隔为1小时的数据
     # raw_data1['load_time'] = pd.to_datetime(raw_data1['load_time'])
@@ -144,8 +147,8 @@ def get_data2(raw_data1):
     # raw_data1 = raw_data1.reset_index(drop=False)
 
 
-def data_process(raw_data1):
-    try:
+try:
+    def data_process(raw_data1):
         arr = np.array(raw_data1['load_time'])
         # 将ndarray转换为DataFrame
         df = pd.DataFrame(arr, columns=['datetime'])
@@ -173,21 +176,20 @@ def data_process(raw_data1):
                      'humidity']  # 将"..."替换为原来的列名及其顺序
         raw_data = raw_data[new_order]
         raw_data = raw_data.iloc[:, 1:]
-        print(raw_data)
-    except Exception as e:
-        logging.error("读取失败，失败原因为")
-        logging.error(traceback.format_exc())
-        raise e
-    finally:
-        mydb.close()
-    logging.info("读取成功")
-    return raw_data, time_before
+        # print(raw_data)
+        return raw_data, time_before
+except Exception:
+    logging.error("读取失败，失败原因为")
+    logging.error(traceback.format_exc())
+finally:
+    mydb.close()
+logging.info("读取成功")
 
 
 def predict_main():
     data, state = get_data1()
-    if state == 0:
-        data = get_data2(data)
+    data, state2 = get_data2(data)
+    if state == 0 and state2 == 0:
         raw_data, time_before = data_process(data)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         data_tensor = torch.tensor(raw_data.values)  # 转换为张量
@@ -212,16 +214,15 @@ def predict_main():
                 data_dict = {'system_id': '10', 'system_name': '光伏功率',
                              'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
                              'forecast_value': float(predictions[i]), 'forecast_type': '4'}
-                print(data_dict)
+                # print(data_dict)
                 # 读取现有预测数据
                 predict_data_ori = np.array(
                     GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
                                          system_id='10', system_name='光伏功率',
                                          forecast_type=data_dict['forecast_type']),
-                    dtype='datetime64[D]')
+                    dtype='datetime64[s]')
 
-                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
-                # print(type(cur))
+                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[s]')
                 if np.isin(cur, predict_data_ori):
                     dic = dict()
                     dic['forecast_value'] = data_dict['forecast_value']
@@ -229,17 +230,17 @@ def predict_main():
                                actual_time=data_dict['actual_time'])
                 else:
                     InsertData(table_name=output_sheet, data_dict=data_dict)
-        except Exception as e:
+        except Exception:
             logging.error("插入数据失败, 失败原因为")
             logging.error(traceback.format_exc())
-            raise e
+            state = 107
         finally:
             mydb.close()
         logging.info("数据插入成功")
-        return 0
-    else:
-        logging.error('数据库为空，无法进行预测')
         return state
+    else:
+        logging.error('数据库为空或数据库无法读取，无法进行预测')
+        return max(state, state2)
 
 
 if __name__ == "__main__":
