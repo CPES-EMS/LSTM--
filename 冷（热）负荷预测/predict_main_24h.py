@@ -71,15 +71,14 @@ def get_data():
             raw_data1 = raw_data1[order]
             raw_data1 = raw_data1.reset_index(drop=True)
             raw_data1 = raw_data1.fillna(0)
-            print(raw_data1)
         else:
             logging.error('全部光伏设备数据为空')
             raw_data1 = pd.DataFrame()
             state = 100
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
@@ -132,12 +131,11 @@ def data_process(raw_data1):
         df.loc[(df['win_or_sum'] >= 11), 'winter'] = 1  # 11月到次年3月定义为冬天
         df.loc[(df['win_or_sum'] <= 3), 'winter'] = 1
         raw_data1 = df
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
     logging.info("读取成功")
-    print(raw_data1)
+    # print(raw_data1)
 
     # 对读取数据进行修改
     if raw_data1.shape[0] <= 24 * 12:
@@ -153,7 +151,7 @@ def data_process(raw_data1):
     raw_data1 = raw_data1.iloc[:, 1:]
     # 解决单位不统一
     raw_data1['load_value'] = raw_data1['load_value'] * 1000
-    print(raw_data1)
+    # print(raw_data1)
     return raw_data1, time_before
 
 
@@ -175,7 +173,6 @@ def predict_main():
             predictions[i] = predictions[i].astype(float)
             if predictions[i] < 0:
                 predictions[i] = 0
-        print(predictions)
 
         # 将预测结果放入数据库
 
@@ -185,14 +182,14 @@ def predict_main():
                 data_dict = {'area_id': '10', 'area_name': '供暖热负荷',
                              'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
                              'forecast_value': float(predictions[i]), 'forecast_type': '24'}
-                print(data_dict)
+                # print(data_dict)
                 # 读取现有预测数据
                 predict_data_ori = np.array(
                     GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
                                          area_id='10', area_name='供暖热负荷',
                                          forecast_type=data_dict['forecast_type']),
-                    dtype='datetime64[D]')
-                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
+                    dtype='datetime64[s]')
+                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[s]')
                 if np.isin(cur, predict_data_ori):
                     dic = dict()
                     dic['forecast_value'] = data_dict['forecast_value']
@@ -200,14 +197,14 @@ def predict_main():
                                actual_time=data_dict['actual_time'])
                 else:
                     InsertData(table_name=output_sheet, data_dict=data_dict)
-        except Exception as e:
+        except Exception:
             logging.error("插入数据失败, 失败原因为")
             logging.error(traceback.format_exc())
-            raise e
+            state = 107
         finally:
             mydb.close()
         logging.info("数据插入成功")
-        return 0
+        return state
     else:
         logging.error('数据库为空，无法进行预测')
         return state
@@ -215,4 +212,3 @@ def predict_main():
 
 if __name__ == "__main__":
     state_code = predict_main()
-
