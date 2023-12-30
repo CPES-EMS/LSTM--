@@ -25,6 +25,7 @@ mydb = mysql.connector.connect(
 
 
 def get_data1():
+    raw_data1 = pd.DataFrame()
     state = 0
     try:
         # 从电气系统数据库读入光伏数据
@@ -32,7 +33,6 @@ def get_data1():
         device_name_list = ['DC/DC-1号DC/DC', 'DC/DC-2号DC/DC', 'DC/DC-3号DC/DC', 'DC/DC-4号DC/DC',
                             'DC/DC-5号DC/DC', 'DC/DC-6号DC/DC']
         position_name_list = ['1#总功率', '2#总功率', '3#总功率', '4#总功率', '5#总功率', '6#总功率']
-        raw_data1 = pd.DataFrame()
         for i in range(0, len(device_name_list)):
             temp_data1 = GetAllDataFromDB(position_name=position_name_list[i],
                                           device_name=device_name_list[i],
@@ -78,10 +78,10 @@ def get_data1():
             logging.error('全部光伏设备数据为空')
             raw_data1 = pd.DataFrame()
             state = 100
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
@@ -89,6 +89,7 @@ def get_data1():
 
 
 def get_data2(raw_data1):
+    state = 0
     try:
 
         # 从电气系统数据库读入买电量数据
@@ -125,23 +126,24 @@ def get_data2(raw_data1):
                 # 按时间分组并求均值
                 temp_data2 = temp_data2.groupby('load_time', as_index=False, sort=True).mean()
                 if temp_data2.shape[0] != raw_data1.shape[0]:
-                    warnings.warn("数据样本不统一")
+                    logging.error("数据样本不统一")
                 raw_data1 = pd.merge(raw_data1, temp_data2, how='outer', on='load_time', sort=True)
             else:
                 logging.error('部分设备买电量数据为空')
         raw_data1 = raw_data1.fillna(0)
 
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
-    return raw_data1
+    return raw_data1, state
 
 
 def get_data3(raw_data1):
+    state = 0
     try:
         same_time = raw_data1['load_time']
         row_name1 = ['load_time', 'load_value']
@@ -174,7 +176,7 @@ def get_data3(raw_data1):
             temp_data3 = temp_data3.groupby('load_time', as_index=False, sort=True).mean()
             # temp_data3 = temp_data3[:-5]
             if temp_data3.shape[0] != raw_data1.shape[0]:
-                warnings.warn("数据样本不统一")
+                logging.error("数据样本不统一")
             raw_data1 = pd.merge(raw_data1, temp_data3, how='outer', on='load_time', sort=True)
         else:
             logging.error('氢燃料电池数据为空')
@@ -184,19 +186,19 @@ def get_data3(raw_data1):
         raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
         order = ['load_time', 'load_value']
         raw_data1 = raw_data1[order]
-        print(raw_data1)
 
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
-    return raw_data1
+    return raw_data1, state
 
 
 def get_data4(raw_data1):
+    state = 0
     try:
         # 从电气系统读入各个设备厂用电数据
         same_time = raw_data1['load_time']
@@ -232,13 +234,12 @@ def get_data4(raw_data1):
                 temp_data4[k] = processed_data3
                 # 按时间分组并求均值
                 temp_data4 = temp_data4.groupby('load_time', as_index=False, sort=True).mean()
-                # if temp_data4.shape[0] != raw_data1.shape[0]:
-                #     warnings.warn("数据样本不统一")
+                if temp_data4.shape[0] != raw_data1.shape[0]:
+                    logging.error("数据样本不统一")
                 raw_data1 = pd.merge(raw_data1, temp_data4, how='outer', on='load_time', sort=True)
             else:
                 logging.error('部分设备耗电量数据为零')
         raw_data1 = raw_data1.fillna(0)
-        print(raw_data1)
 
         # 求和得到总的耗电量
         raw_data1['use'] = raw_data1.iloc[:, 2:].sum(axis=1)
@@ -246,7 +247,7 @@ def get_data4(raw_data1):
         raw_data1['load_value'] = raw_data1['load_value'] - raw_data1['use']
         order = ['load_time', 'load_value']
         raw_data1 = raw_data1[order]
-        print(raw_data1)
+        # print(raw_data1)
 
     #     # 降采样处理得到间隔为1小时的数据
     #     raw_data1['load_time'] = pd.to_datetime(raw_data1['load_time'])
@@ -254,18 +255,18 @@ def get_data4(raw_data1):
     #     # 降采样为1小时数据，保留每小时内的第一个值
     #     raw_data1 = raw_data1.resample('1H').first().shift(1, freq='10min')
     #     raw_data1 = raw_data1.reset_index(drop=False)
-    except Exception as e:
+    except Exception:
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
-        raise e
+        state = 106
     finally:
         mydb.close()
     logging.info("读取成功")
-    return raw_data1
+    return raw_data1, state
 
 
-def data_process(raw_data1):
-    try:
+try:
+    def data_process(raw_data1):
 
         arr = np.array(raw_data1['load_time'])
         # 将ndarray转换为DataFrame
@@ -291,35 +292,34 @@ def data_process(raw_data1):
         df.loc[(df['weekdays'] == 6), 'weekend_sun'] = 1
         df['load_value'] = raw_data1['load_value'].astype(float)
         raw_data = df
-    except Exception as e:
-        logging.error("添加时间列失败，失败原因为")
-        logging.error(traceback.format_exc())
-        raise e
-    logging.info("添加成功")
-    print(raw_data)
+        # print(raw_data)
 
-    # 对读取数据进行修改
-    if raw_data.shape[0] <= 4 * 12:
-        raw_data = raw_data
-    else:
-        raw_data = raw_data.iloc[-4 * 12:, :]
+        # 对读取数据进行修改
+        if raw_data.shape[0] <= 4 * 12:
+            raw_data = raw_data
+        else:
+            raw_data = raw_data.iloc[-4 * 12:, :]
 
-    time_before = raw_data['datetime']
-    time_before = time_before.reset_index(drop=True)
-    new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
-                 'weekend_sun']  # 将"..."替换为原来的列名及其顺序
-    raw_data = raw_data[new_order]
-    raw_data = raw_data.iloc[:, 1:]
-
-    return raw_data, time_before
+        time_before = raw_data['datetime']
+        time_before = time_before.reset_index(drop=True)
+        new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
+                     'weekend_sun']  # 将"..."替换为原来的列名及其顺序
+        raw_data = raw_data[new_order]
+        raw_data = raw_data.iloc[:, 1:]
+        return raw_data, time_before
+except Exception:
+    logging.error("添加时间列失败，失败原因为")
+    logging.error(traceback.format_exc())
+logging.info("添加成功")
 
 
 def predict_main():
     data, state = get_data1()
-    if state == 0:
-        data = get_data2(data)
-        data = get_data3(data)
-        data = get_data4(data)
+    data, state2 = get_data2(data)
+    data, state3 = get_data3(data)
+    data, state4 = get_data4(data)
+    if state == 0 and state2 == 0 and state3 == 0 and state4 == 0:
+
         raw_data, time_before = data_process(data)
         # 调用模型进行预测
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -337,8 +337,6 @@ def predict_main():
             if predictions[i] < 0:
                 predictions[i] = 0
 
-
-
         # 将预测结果放入数据库
 
         try:
@@ -347,13 +345,13 @@ def predict_main():
                 data_dict = {'area_id': '10', 'area_name': '电负荷',
                              'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
                              'forecast_value': float(predictions[i]), 'forecast_type': '4'}
-                print(data_dict)
+                # print(data_dict)
                 # 读取现有预测数据
                 predict_data_ori = np.array(
                     GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
                                          area_id='10', area_name='电负荷', forecast_type=data_dict['forecast_type']),
-                    dtype='datetime64[D]')
-                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[D]')
+                    dtype='datetime64[s]')
+                cur = np.datetime64(data_dict['actual_time']).astype('datetime64[s]')
                 if np.isin(cur, predict_data_ori):
                     dic = dict()
                     dic['forecast_value'] = data_dict['forecast_value']
@@ -364,14 +362,14 @@ def predict_main():
         except Exception as e:
             logging.error("插入数据失败, 失败原因为")
             logging.error(traceback.format_exc())
-            raise e
+            state = 107
         finally:
             mydb.close()
         logging.info("数据插入成功")
-        return 0
-    else:
-        logging.error('数据库为空，无法进行预测')
         return state
+    else:
+        logging.error('数据库为空或数据库无法读取，无法进行预测')
+        return max(state, state2, state3, state4)
 
 
 if __name__ == "__main__":
