@@ -6,13 +6,13 @@ import traceback
 
 from LSTM_validation import Lstm_Net
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, env_sheet, \
-    dataaddress, port_num, user_name, password, datause
+    dataaddress, port_num, user_name, password, datause, device
 from sql_lstm import GetAllDataFromDB, InsertData, UpdateData, GetNearestDataFromDB, GetPredictDataFromDB
 import pandas as pd
 import torch
 import numpy as np
 
-Lstm_Net.load_state_dict(torch.load("./output_results/model_4h.pt"))  # 加载模型参数
+Lstm_Net.load_state_dict(torch.load("./output_results/model_4h.pt", map_location=device))  # 加载模型参数
 mydb = mysql.connector.connect(
     host=dataaddress,  # 数据库主机地址
     port=port_num,
