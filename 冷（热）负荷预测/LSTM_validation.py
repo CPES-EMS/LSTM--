@@ -12,7 +12,7 @@ import torch
 from LSTM_train import MyDataset
 
 Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)  # 构造 LSTM 模型，将
-Lstm_Net.load_state_dict(torch.load("./output_results/model_24h.pt"))  # 加载模型参数
+Lstm_Net.load_state_dict(torch.load("./output_results/model_24h.pt", map_location=device))  # 加载模型参数
 
 try:
     logging.info("读入数据")
@@ -56,29 +56,29 @@ with torch.no_grad():  # 不计算梯度，加速推理过程
         loss.append(criterion(output, label).item())  # 计算损失并将其存储到损失列表中
 
     val_losses.append(np.mean(loss))  # 计算验证损失的均值并存储到验证损失列表中
-    print("Validation Loss: %.4f" % (np.mean(loss)))  # 打印验证损失
-
-# 绘制真实数据与预测数据的对比曲线
-plt.figure()
-# 生成x轴刻度和标签
-# x_ticks = np.arange(0, window_label_size, 1)
-# x_tick_labels = ['7', '8', '9', '10']
-try:
-    logging.info("绘制图形")
-    plt.plot(labels.flatten(), label='True Data')
-    plt.plot(predictions.flatten(), label='Predictions')
-except Exception as e:
-    logging.error("绘制失败，失败原因为")
-    logging.error(traceback.format_exc())
-    raise e
-logging.info("绘制成功")
-# plt.xticks(x_ticks, x_tick_labels)
-plt.xlabel('Time(h)')
-plt.ylabel('heat_load(KW)')
-plt.legend()
-plt.savefig("./output_results/data_comparison.png")  # 保存图像
-plt.show()
-plt.close()  # 关闭当前图形窗口
+#     print("Validation Loss: %.4f" % (np.mean(loss)))  # 打印验证损失
+#
+# # 绘制真实数据与预测数据的对比曲线
+# plt.figure()
+# # 生成x轴刻度和标签
+# # x_ticks = np.arange(0, window_label_size, 1)
+# # x_tick_labels = ['7', '8', '9', '10']
+# try:
+#     logging.info("绘制图形")
+#     plt.plot(labels.flatten(), label='True Data')
+#     plt.plot(predictions.flatten(), label='Predictions')
+# except Exception as e:
+#     logging.error("绘制失败，失败原因为")
+#     logging.error(traceback.format_exc())
+#     raise e
+# logging.info("绘制成功")
+# # plt.xticks(x_ticks, x_tick_labels)
+# plt.xlabel('Time(h)')
+# plt.ylabel('heat_load(KW)')
+# plt.legend()
+# plt.savefig("./output_results/data_comparison.png")  # 保存图像
+# plt.show()
+# plt.close()  # 关闭当前图形窗口
 
 df_predictions = pd.DataFrame(predictions.flatten())
 
@@ -94,6 +94,5 @@ except Exception as e:
     logging.error("保存失败，失败原因为")
     logging.error(traceback.format_exc())
     raise e
-finally:
-    df_predictions.close()
+
 logging.info("结果保存成功")
