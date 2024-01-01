@@ -19,20 +19,20 @@ try:
     # 预测数据
     filepath = './handled_data/yulin_load_elc.csv'
     data = pd.read_csv(filepath, encoding="utf-8")
-except Exception as e:
+except Exception:
     logging.error("读取数据失败, 失败原因为")
     logging.error(traceback.format_exc())
-    raise e
+
 logging.info("数据读取成功")
 try:
     logging.info("构建验证数据集")
     test_data = data[int(len(data) * 0.80):]  # 选择最后 window_input_size 条数据作为测试数据
     test_dataset = MyDataset(test_data, window_input_size, window_label_size)  # 构造测试数据集
     test_dataloader = DataLoader(test_dataset, batch_size, shuffle=False)  # 构造测试数据加载器
-except Exception as e:
+except Exception:
     logging.error("构建失败，失败原因为")
     logging.error(traceback.format_exc())
-    raise e
+
 logging.info("构建成功")
 
 # 使用smooth误差损失函数
@@ -90,8 +90,8 @@ try:
     workbook.save(excel_filename)
     with pd.ExcelWriter(excel_filename, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
         df_predictions.to_excel(writer, index=False, sheet_name='Sheet1', header=['predicted_power'])
-except Exception as e:
+except Exception:
     logging.error("保存失败，失败原因为")
     logging.error(traceback.format_exc())
-    raise e
+
 logging.info("结果保存成功")
