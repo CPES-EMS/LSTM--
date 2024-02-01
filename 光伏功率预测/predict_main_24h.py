@@ -1,17 +1,17 @@
 import mysql.connector
 import sys
-import warnings
 from datetime import timedelta
 import traceback
-
-from LSTM_validation import Lstm_Net
+from get_data import *
+from model import LstmNet
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, env_sheet, \
-    dataaddress, port_num, user_name, password, datause, device
+    dataaddress, port_num, user_name, password, datause, device, input_size, output_size, hidden_size
 from sql_lstm import GetAllDataFromDB, InsertData, UpdateData, GetNearestDataFromDB, GetPredictDataFromDB
 import pandas as pd
 import torch
 import numpy as np
 
+Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)
 Lstm_Net.load_state_dict(torch.load("./output_results/model_24h.pt", map_location=device))  # 加载模型参数
 mydb = mysql.connector.connect(
     host=dataaddress,  # 数据库主机地址
@@ -20,131 +20,6 @@ mydb = mysql.connector.connect(
     passwd=password,  # 数据库密码
     database=datause
 )
-
-
-def get_data1():
-    raw_data1 = pd.DataFrame()
-    state = 0
-    try:
-        # 从电气系统数据库读入光伏数据
-        row_name1 = ['load_time', 'load_value']
-        device_name_list = ['DC/DC-1号DC/DC', 'DC/DC-2号DC/DC', 'DC/DC-3号DC/DC', 'DC/DC-4号DC/DC',
-                            'DC/DC-5号DC/DC', 'DC/DC-6号DC/DC']
-        position_name_list = ['1#总功率', '2#总功率', '3#总功率',
-                              '4#总功率', '5#总功率', '6#总功率']
-        for i in range(0, len(device_name_list)):
-            temp_data1 = GetAllDataFromDB(position_name=position_name_list[i],
-                                          device_name=device_name_list[i],
-                                          system_name='光伏系统',
-                                          system_id='0101', row_name=','.join(row_name1),
-                                          table_name=els_sheet,
-                                          time='load_time',
-                                          start_time=None)
-            if temp_data1.shape[0] > 0:
-                if i == 0:
-                    raw_data1['load_time'] = temp_data1['load_time']
-                    raw_data1[i] = temp_data1['load_value']
-                else:
-                    raw_data1[i] = temp_data1['load_value']
-            else:
-                logging.error('部分光伏设备数据为空')
-        if raw_data1.shape[0] > 0:
-            # 求和得到总的光伏功率
-            raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
-            # 对读入数据展平并转化为Series对象
-            load_time = raw_data1['load_time'].values.flatten()
-            load_value = raw_data1['load_value'].values.flatten()
-            # 对异常值进行处理
-            processed_data = []  # 存储处理后的数据
-            for i in range(len(load_value)):
-                if load_value[i] < -100:
-                    processed_data.append(load_value[i - 1])
-                elif load_value[i] > 100000:
-                    processed_data.append(load_value[i - 1])
-                else:
-                    processed_data.append(load_value[i])
-            processed_data = np.array(processed_data)
-            raw_data1 = pd.DataFrame()
-            raw_data1['load_time'] = load_time
-            raw_data1['load_value'] = processed_data
-            # 按时间分组并求均值
-            raw_data1 = raw_data1.groupby('load_time', as_index=False, sort=True).mean()
-
-            order = ['load_time', 'load_value']
-            raw_data1 = raw_data1[order]
-            raw_data1 = raw_data1.reset_index(drop=True)
-        else:
-            logging.error('全部光伏设备数据为空')
-            raw_data1 = pd.DataFrame()
-            state = 100
-    except Exception:
-        logging.error("读取失败，失败原因为")
-        logging.error(traceback.format_exc())
-        state = 106
-    finally:
-        mydb.close()
-    logging.info("读取成功")
-    return raw_data1, state
-
-
-def get_data2(raw_data1):
-    state = 0
-    try:
-        same_time = raw_data1['load_time']
-        row_name1 = ['load_time', 'load_value']
-        # 从环境系统数据库读入天气预报数据
-        position_name_list1 = ['室外温度（单位：℃）', '室外湿度（单位：％）']
-        device_name_list1 = ['天气预报-温度', '天气预报-湿度']
-        for j in range(0, len(position_name_list1)):
-            temp_data2 = GetNearestDataFromDB(position_name=position_name_list1[j],
-                                              device_name=device_name_list1[j],
-                                              system_name='室外环境', target_time=same_time,
-                                              system_id='0501', row_name=','.join(row_name1),
-                                              table_name=env_sheet,
-                                              time='load_time',
-                                              start_time=None)
-            if temp_data2.shape[0] > 0:
-                # 对读入数据展平并转化为Series对象
-                load_time1 = temp_data2['load_time'].values.flatten()
-                load_value1 = temp_data2['load_value'].values.flatten()
-                # 对异常值进行处理
-                processed_data = []  # 存储处理后的数据
-                for i in range(len(load_value1)):
-                    if load_value1[i] < -100:
-                        processed_data.append(load_value1[i - 1])
-                    elif load_value1[i] > 100:
-                        processed_data.append(load_value1[i - 1])
-                    else:
-                        processed_data.append(load_value1[i])
-                processed_data = np.array(processed_data)
-                temp_data2 = pd.DataFrame()
-                temp_data2['load_time'] = load_time1
-                temp_data2[j] = processed_data
-                # 按照时间进行排序
-                temp_data2 = temp_data2.groupby('load_time', as_index=False, sort=True).mean()
-
-                if temp_data2.shape[0] != raw_data1.shape[0]:
-
-                    logging.error("数据样本不统一")
-                raw_data1 = pd.merge(raw_data1, temp_data2, how='outer', on='load_time', sort=True)
-            else:
-                logging.error('部分环境设备数据为空')
-        raw_data1 = raw_data1.fillna(0)
-    except Exception:
-        logging.error("读取失败，失败原因为")
-        logging.error(traceback.format_exc())
-        state = 106
-    finally:
-        mydb.close()
-    logging.info("读取成功")
-    return raw_data1, state
-
-    # # 降采样处理得到间隔为1小时的数据
-    # raw_data1['load_time'] = pd.to_datetime(raw_data1['load_time'])
-    # raw_data1.set_index('load_time', inplace=True)
-    # # 降采样为1小时数据，保留每小时内的第一个值
-    # raw_data1 = raw_data1.resample('1H').first().shift(1, freq='10min')
-    # raw_data1 = raw_data1.reset_index(drop=False)
 
 
 try:

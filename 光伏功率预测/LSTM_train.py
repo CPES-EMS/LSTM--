@@ -1,6 +1,7 @@
 import os  # 导入 os 库，用于处理文件路径
 import math
 import traceback
+from get_data import *
 from config import logging, window_input_size, window_label_size, batch_size, input_size, hidden_size, output_size, \
     device, epoch, window_gap_size
 import pandas as pd  # 导入 Pandas 库，用于数据处理
@@ -27,7 +28,7 @@ class MyDataset(Dataset):
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = window_gap_size  # 滑动步长
+        self.window_gap = window_gap_size   # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
 
@@ -52,43 +53,60 @@ class MyDataset(Dataset):
 
 
 if __name__ == "__main__":
-    # 读取数据
-    filedir = "./data/pv"  # 数据文件夹路径
-    filename = "PV_train_time.csv"  # 数据文件名
-    try:
-        logging.info("读入数据")
-        filepath = os.path.join(filedir, filename)  # 构造数据文件完整路径
-        data = pd.read_csv(filepath, encoding="gbk")  # 读取 CSV 格式的数据文件
-    except Exception as e:
-        logging.error("读取数据失败, 失败原因为")
-        logging.error(traceback.format_exc())
-        raise e
-    logging.info("数据读取成功")
+    # # 读取数据
+    # filedir = "./data/pv"  # 数据文件夹路径
+    # filename = "PV_train_time.csv"  # 数据文件名
+    # try:
+    #     logging.info("读入数据")
+    #     filepath = os.path.join(filedir, filename)  # 构造数据文件完整路径
+    #     data = pd.read_csv(filepath, encoding="gbk")  # 读取 CSV 格式的数据文件
+    # except Exception as e:
+    #     logging.error("读取数据失败, 失败原因为")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+    # logging.info("数据读取成功")
+    data, state = get_data1()
+    data, state2 = get_data2(data)
 
-    try:
-        logging.info("时间列转换")
-        data['时间'] = pd.to_datetime(data['时间'])
-    except Exception as e:
-        logging.error("时间列不存在")
-        logging.error(traceback.format_exc())
-        raise e
-    logging.info("时间列转换成功")
-    # 拆分时间列为年、月、日、小时、分钟四列
-    data['year'] = data['时间'].dt.year
-    data['month'] = data['时间'].dt.month
-    data['day'] = data['时间'].dt.day
-    data['hour'] = data['时间'].dt.hour
-    # 删除原来的时间列
-    data = data.drop(['时间'], axis=1)
-    try:
-        # 调整列的顺序，将新列插入到合适的位置
-        new_order = ['year', 'month', 'day', 'hour', '功率', '温度',
-                     '湿度']  # 将"..."替换为原来的列名及其顺序
-        data = data[new_order]
-    except Exception as e:
-        logging.error("数据修改失败")
-        logging.error(traceback.format_exc())
-        raise e
+    # try:
+    #     logging.info("时间列转换")
+    #     data['时间'] = pd.to_datetime(data['时间'])
+    # except Exception as e:
+    #     logging.error("时间列不存在")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+    # logging.info("时间列转换成功")
+    # # 拆分时间列为年、月、日、小时、分钟四列
+    # data['year'] = data['时间'].dt.year
+    # data['month'] = data['时间'].dt.month
+    # data['day'] = data['时间'].dt.day
+    # data['hour'] = data['时间'].dt.hour
+    # # 删除原来的时间列
+    # data = data.drop(['时间'], axis=1)
+    # try:
+    #     # 调整列的顺序，将新列插入到合适的位置
+    #     new_order = ['year', 'month', 'day', 'hour', '功率', '温度',
+    #                  '湿度']  # 将"..."替换为原来的列名及其顺序
+    #     data = data[new_order]
+    # except Exception as e:
+    #     logging.error("数据修改失败")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+
+    arr = np.array(data['load_time'])
+    # 将ndarray转换为DataFrame
+    df = pd.DataFrame(arr, columns=['datetime'])
+    # 将datetime列转换为Datetime对象
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df['year'] = df['datetime'].dt.year
+    df['month'] = df['datetime'].dt.month
+    df['day'] = df['datetime'].dt.day
+    df['hour'] = df['datetime'].dt.hour
+    df['load_value'] = data['load_value'].astype(float)
+
+    df['temperature'] = data[0].astype(float)
+    df['humidity'] = data[1].astype(float)
+    raw_data = df
     try:
         logging.info("存储新的数据集")
         # 将处理后的数据写入到新的的CSV文件中, 不写入索引
@@ -99,7 +117,7 @@ if __name__ == "__main__":
         raise e
     logging.info("新数据集存储成功")
     # 划分训练集和验证集
-    train_data = data[: int(len(data) * 0.78)]  # 前 80% 的数据作为训练集
+    train_data = data[: int(len(data) * 0.80)]  # 前 80% 的数据作为训练集
     try:
         logging.info("构建训练数据集")
         # 创建训练集和验证集的数据集和数据加载器
