@@ -3,16 +3,17 @@ import warnings
 import sys
 from datetime import timedelta
 import traceback
-
-from LSTM_validation import Lstm_Net
+from get_data import *
+from model import LstmNet
 from config import window_label_size, logging, els_sheet, hydrogen_sheet, hvac_sheet, output_sheet, dataaddress, \
-    port_num, user_name, password, datause, device
+    port_num, user_name, password, datause, device, input_size, output_size, hidden_size
 from sql_lstm import GetAllDataFromDB, InsertData, UpdateData, GetNearestDataFromDB, GetPredictDataFromDB
 import pandas as pd
 import torch
 import numpy as np
 
-Lstm_Net.load_state_dict(torch.load("./output_results/model_4h.pt", map_location=device))  # 加载模型参数
+Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)
+Lstm_Net.load_state_dict(torch.load("./output_results/model_4h2.pt", map_location=device))  # 加载模型参数
 mydb = mysql.connector.connect(
     host=dataaddress,  # 数据库主机地址
     port=port_num,
@@ -20,69 +21,6 @@ mydb = mysql.connector.connect(
     passwd=password,  # 数据库密码
     database=datause
 )
-
-
-def get_data():
-    state = 0
-    try:
-        # 从暖通系统数据库读入数据
-        raw_data1 = pd.DataFrame()
-        row_name1 = ['load_time', 'load_value']
-        device_name_list = ['暖通管道-能源站供水管冷热量监测E2', '暖通管道-接DK-1及DK-2地块供水管冷热量监测E3']
-        for i in range(len(device_name_list)):
-            temp_data1 = GetAllDataFromDB(position_name='热量', device_name=device_name_list[i],
-                                          system_name='供热（冷）系统',
-                                          system_id='0201', row_name=','.join(row_name1),
-                                          table_name=hvac_sheet,
-                                          time='load_time',
-                                          start_time=None)
-
-            if temp_data1.shape[0] > 0:
-                if i == 0:
-                    raw_data1['load_time'] = temp_data1['load_time']
-                    raw_data1[i] = temp_data1['load_value']
-                else:
-                    raw_data1[i] = temp_data1['load_value']
-            else:
-                logging.error('部分暖通设备数据为空')
-        if raw_data1.shape[0] > 0:
-            # 求和得到总的热负荷
-            raw_data1['load_value'] = raw_data1.iloc[:, 1:].sum(axis=1)
-            # 对读入数据展平并转化为Series对象
-            load_time = raw_data1['load_time'].values.flatten()
-            load_value = raw_data1['load_value'].values.flatten()
-            # 对异常值进行处理
-            processed_data = []  # 存储处理后的数据
-            for i in range(len(load_value)):
-                if load_value[i] < -100:
-                    processed_data.append(load_value[i - 1])
-                elif load_value[i] > 100:
-                    processed_data.append(load_value[i - 1])
-                else:
-                    processed_data.append(load_value[i])
-            processed_data = np.array(processed_data)
-            raw_data1 = pd.DataFrame()
-            raw_data1['load_time'] = load_time
-            raw_data1['load_value'] = processed_data
-            # 按时间分组并求均值
-            raw_data1 = raw_data1.groupby('load_time', as_index=False, sort=True).mean()
-
-            order = ['load_time', 'load_value']
-            raw_data1 = raw_data1[order]
-            raw_data1 = raw_data1.reset_index(drop=True)
-            raw_data1 = raw_data1.fillna(0)
-        else:
-            logging.error('全部光伏设备数据为空')
-            raw_data1 = pd.DataFrame()
-            state = 100
-    except Exception:
-        logging.error("读取失败，失败原因为")
-        logging.error(traceback.format_exc())
-        state = 106
-    finally:
-        mydb.close()
-    logging.info("读取成功")
-    return raw_data1, state
 
 
 def data_process(raw_data1):
@@ -135,7 +73,7 @@ def data_process(raw_data1):
         logging.error("读取失败，失败原因为")
         logging.error(traceback.format_exc())
     logging.info("读取成功")
-    # print(raw_data1)
+    print(raw_data1)
 
     # 对读取数据进行修改
     if raw_data1.shape[0] <= 4 * 12:
@@ -149,8 +87,6 @@ def data_process(raw_data1):
                  'winter', 'weekend_sun', 'summer']
     raw_data1 = raw_data1[new_order]
     raw_data1 = raw_data1.iloc[:, 1:]
-    # 解决单位不统一
-    raw_data1['load_value'] = raw_data1['load_value'] * 1000
     # print(raw_data1)
     return raw_data1, time_before
 
@@ -170,7 +106,7 @@ def predict_main():
         predict_time = [(time_before + timedelta(hours=4))]
         predictions = [inner_list[0] for outer_list in predictions for inner_list in outer_list]
         for i in range(len(predictions)):
-            predictions[i] = predictions[i].astype(float)
+            predictions[i] = predictions[i].astype(float) / 100
             if predictions[i] < 0:
                 predictions[i] = 0
 
@@ -182,7 +118,7 @@ def predict_main():
                 data_dict = {'area_id': '10', 'area_name': '供暖热负荷',
                              'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
                              'forecast_value': float(predictions[i]), 'forecast_type': '4'}
-                # print(data_dict)
+                print(data_dict)
                 # 读取现有预测数据
                 predict_data_ori = np.array(
                     GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
@@ -212,3 +148,5 @@ def predict_main():
 
 if __name__ == "__main__":
     state_code = predict_main()
+    # data, state = get_data()
+    # data_process(data)

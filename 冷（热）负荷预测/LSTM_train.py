@@ -10,7 +10,7 @@ import torch.nn as nn  # 导入 PyTorch 库中的神经网络模块，用于定�
 from torch.utils.data import Dataset, DataLoader  # 从 PyTorch 库中导入 Dataset 和 DataLoader 类，用于构建自定义数据集和数据加载器
 from model import LstmNet  # 导入自定义的模型类 LstmNet
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from dateutil import parser
+from get_data import *
 
 """ 自定义数据集类，用于构建 PyTorch 的数据加载器（DataLoader），用于训练或评估模型
  Args:
@@ -28,7 +28,7 @@ class MyDataset(Dataset):
         self.data = pd.DataFrame(data)  # 将 data 转换为 Pandas 数据框
         self.window_input_size = window_input_size  # 输入窗口大小
         self.window_label_size = window_label_size  # 输出窗口大小
-        self.window_gap = window_gap_size  # 滑动步长
+        self.window_gap = window_gap_size # 滑动步长
 
     def __getitem__(self, index):  # 获取数据
         start_index = self.window_gap * index  # 计算起始索引
@@ -52,77 +52,121 @@ class MyDataset(Dataset):
 
 
 if __name__ == "__main__":
-    # 读取数据
-    filedir = "./data/pv"  # 数据文件夹路径
-    filename = "yulin_load.xlsx"  # 数据文件名
-    try:
-        logging.info("读入数据")
-        filepath = os.path.join(filedir, filename)  # 构造数据文件完整路径
-        data = pd.read_excel(filepath)  # 读取 CSV 格式的数据文件
-    except Exception as e:
-        logging.error("读取数据失败, 失败原因为")
-        logging.error(traceback.format_exc())
-        raise e
-    logging.info("数据读取成功")
-    try:
-        logging.info("时间列转换")
-        data['日期'] = pd.to_datetime(data['日期'], format='%Y-%m-%d %H:%M:%S')
-    except Exception as e:
-        logging.error("时间列不存在")
-        logging.error(traceback.format_exc())
-        raise e
-    logging.info("时间列转换成功")
-    # 拆分时间列为年、月、日、小时、分钟四列
-    data['year'] = data['日期'].dt.year
-    data['month'] = data['日期'].dt.month
-    data['day'] = data['日期'].dt.day
-    data['hour'] = data['日期'].dt.hour
-    # 增添小时列
-    hour = 0
-    for row in data.itertuples():
-        data.at[row.Index, 'hour'] = hour
-        hour = (hour + 1) % 24
+    # # 读取数据
+    # filedir = "./data/pv"  # 数据文件夹路径
+    # filename = "yulin_load.xlsx"  # 数据文件名
+    # try:
+    #     logging.info("读入数据")
+    #     filepath = os.path.join(filedir, filename)  # 构造数据文件完整路径
+    #     data = pd.read_excel(filepath)  # 读取 CSV 格式的数据文件
+    # except Exception as e:
+    #     logging.error("读取数据失败, 失败原因为")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+    # logging.info("数据读取成功")
+    data, state = get_data()
+    # try:
+    #     logging.info("时间列转换")
+    #     data['日期'] = pd.to_datetime(data['日期'], format='%Y-%m-%d %H:%M:%S')
+    # except Exception as e:
+    #     logging.error("时间列不存在")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+    # logging.info("时间列转换成功")
+    # # 拆分时间列为年、月、日、小时、分钟四列
+    # data['year'] = data['日期'].dt.year
+    # data['month'] = data['日期'].dt.month
+    # data['day'] = data['日期'].dt.day
+    # data['hour'] = data['日期'].dt.hour
+    # # 增添小时列
+    # hour = 0
+    # for row in data.itertuples():
+    #     data.at[row.Index, 'hour'] = hour
+    #     hour = (hour + 1) % 24
+    # week_list = []
+    # # 增添时间列为星期几
+    # for row in range(data.shape[0]):
+    #     weekdays = data['日期'][row]
+    #     week_list.append(weekdays.weekday())
+    # data['weekdays'] = pd.DataFrame(week_list)
+    # # 对周末进行标记，热负荷可能变化
+    # data.loc[:, 'weekend'] = 0
+    # data.loc[:, 'weekend_sat'] = 0
+    # data.loc[:, 'weekend_sun'] = 0
+    # data.loc[(data['weekdays'] > 4), 'weekend'] = 1
+    # data.loc[(data['weekdays'] == 5), 'weekend_sat'] = 1
+    # data.loc[(data['weekdays'] == 6), 'weekend_sun'] = 1
+    # # 夏天冷负荷，冬天热负荷，对夏天冬天进行标记
+    # month_list = []
+    # for row in range(data.shape[0]):
+    #     months = data['month'][row]
+    #     print(type(month_list))
+    #     month_list.append(months)
+    # data['win_or_sum'] = pd.DataFrame(month_list)
+    # print(type(data['win_or_sum'].values))
+    # data.loc[:, 'summer'] = 0
+    # data.loc[:, 'winter'] = 0
+    # data.loc[(6 <= data['win_or_sum']), 'summer'] = 1  # 6月-9月定义为夏天
+    # data.loc[(data['win_or_sum'] >= 10), 'summer'] = 0
+    # data.loc[(data['win_or_sum'] >= 11), 'winter'] = 1  # 11月到次年3月定义为冬天
+    # data.loc[(data['win_or_sum'] <= 3), 'winter'] = 1
+    # print(data)
+    # # # 删除原来的时间列
+    # # data = data.drop(['时间'], axis=1)
+    # try:
+    #     # 调整列的顺序，将新列插入到合适的位置
+    #     new_order = ['year', 'month', 'day', 'hour', '供暖热负荷(kW)', 'weekend', 'weekend_sat',
+    #                  'winter', 'weekend_sun', 'summer']
+    #     # 将"..."替换为原来的列名及其顺序
+    #     data = data[new_order]
+    # except Exception as e:
+    #     logging.error("数据修改失败")
+    #     logging.error(traceback.format_exc())
+    #     raise e
+    # print(data)
+    arr = np.array(data['load_time'])
+    # 将ndarray转换为DataFrame
+    df = pd.DataFrame(arr, columns=['datetime'])
+    # 将datetime列转换为Datetime对象
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df['year'] = df['datetime'].dt.year
+    df['month'] = df['datetime'].dt.month
+    df['day'] = df['datetime'].dt.day
+    df['hour'] = df['datetime'].dt.hour
     week_list = []
     # 增添时间列为星期几
-    for row in range(data.shape[0]):
-        weekdays = data['日期'][row]
+    for row in range(df.shape[0]):
+        weekdays = df['datetime'][row]
         week_list.append(weekdays.weekday())
-    data['weekdays'] = pd.DataFrame(week_list)
-    # 对周末进行标记，热负荷可能变化
-    data.loc[:, 'weekend'] = 0
-    data.loc[:, 'weekend_sat'] = 0
-    data.loc[:, 'weekend_sun'] = 0
-    data.loc[(data['weekdays'] > 4), 'weekend'] = 1
-    data.loc[(data['weekdays'] == 5), 'weekend_sat'] = 1
-    data.loc[(data['weekdays'] == 6), 'weekend_sun'] = 1
+    df['weekdays'] = pd.DataFrame(week_list)
+    # 对周末进行标记，用电量可能增多
+    df.loc[:, 'weekend'] = 0
+    df.loc[:, 'weekend_sat'] = 0
+    df.loc[:, 'weekend_sun'] = 0
+    df.loc[(df['weekdays'] > 4), 'weekend'] = 1
+    df.loc[(df['weekdays'] == 5), 'weekend_sat'] = 1
+    df.loc[(df['weekdays'] == 6), 'weekend_sun'] = 1
+    df['load_value'] = data['load_value'].astype(float)
+
     # 夏天冷负荷，冬天热负荷，对夏天冬天进行标记
     month_list = []
-    for row in range(data.shape[0]):
-        months = data['month'][row]
-        print(type(month_list))
+    for row in range(df.shape[0]):
+        months = df['month'][row]
         month_list.append(months)
-    data['win_or_sum'] = pd.DataFrame(month_list)
-    print(type(data['win_or_sum'].values))
-    data.loc[:, 'summer'] = 0
-    data.loc[:, 'winter'] = 0
-    data.loc[(6 <= data['win_or_sum']), 'summer'] = 1  # 6月-9月定义为夏天
-    data.loc[(data['win_or_sum'] >= 10), 'summer'] = 0
-    data.loc[(data['win_or_sum'] >= 11), 'winter'] = 1  # 11月到次年3月定义为冬天
-    data.loc[(data['win_or_sum'] <= 3), 'winter'] = 1
+    df['win_or_sum'] = pd.DataFrame(month_list)
+    df.loc[:, 'summer'] = 0
+    df.loc[:, 'winter'] = 0
+    df.loc[(6 <= df['win_or_sum']), 'summer'] = 1  # 6月-9月定义为夏天
+    df.loc[(df['win_or_sum'] >= 10), 'summer'] = 0
+    df.loc[(df['win_or_sum'] >= 11), 'winter'] = 1  # 11月到次年3月定义为冬天
+    df.loc[(df['win_or_sum'] <= 3), 'winter'] = 1
+    data = df
+    new_order = ['year', 'month', 'day', 'hour', 'load_value', 'weekend', 'weekend_sat',
+                 'winter', 'weekend_sun', 'summer']
+    data = data[new_order]
+
     print(data)
-    # # 删除原来的时间列
-    # data = data.drop(['时间'], axis=1)
-    try:
-        # 调整列的顺序，将新列插入到合适的位置
-        new_order = ['year', 'month', 'day', 'hour', '供暖热负荷(kW)', 'weekend', 'weekend_sat',
-                     'winter', 'weekend_sun', 'summer']
-        # 将"..."替换为原来的列名及其顺序
-        data = data[new_order]
-    except Exception as e:
-        logging.error("数据修改失败")
-        logging.error(traceback.format_exc())
-        raise e
-    print(data)
+
     try:
         logging.info("存储新的数据集")
         # 将处理后的数据写入到新的的CSV文件中, 不写入索引
@@ -148,11 +192,11 @@ if __name__ == "__main__":
     # 实例化模型
     Lstm_Net = LstmNet(input_size, hidden_size, output_size, window_label_size).to(device)  # 构造 LSTM 模型，将模型放到指定设备上
     # 设置优化器和损失函数
-    optimizer = torch.optim.AdamW(Lstm_Net.parameters(), lr=0.0015, weight_decay=0.01)  # 使用 AdamW 优化器
+    optimizer = torch.optim.AdamW(Lstm_Net.parameters(), lr=0.002, weight_decay=0.01)  # 使用 AdamW 优化器
     # 使用smooth误差损失函数
     criterion = nn.SmoothL1Loss()
     # 定义余弦退火学习率调整器
-    scheduler = CosineAnnealingLR(optimizer, T_max=10000, eta_min=0.0005)
+    scheduler = CosineAnnealingLR(optimizer, T_max=10000, eta_min=0.001)
 
     # 初始化列表来存储训练和验证损失
     train_losses = []  # 训练损失列表
@@ -186,7 +230,7 @@ if __name__ == "__main__":
     try:
         logging.info("保存模型参数")
         # 将模型的参数保存到文件中，文件名为 model.pt
-        torch.save(Lstm_Net.state_dict(), "./output_results/model_24h.pt")
+        torch.save(Lstm_Net.state_dict(), "./output_results/model_4h3.pt")
     except Exception as e:
         logging.error("保存失败，失败原因为")
         logging.error(traceback.format_exc())
