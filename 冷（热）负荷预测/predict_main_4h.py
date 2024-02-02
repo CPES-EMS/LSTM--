@@ -118,7 +118,7 @@ def predict_main():
                 data_dict = {'area_id': '10', 'area_name': '供暖热负荷',
                              'actual_time': predict_time[0][i].strftime('%Y-%m-%d %H:%M:%S'),
                              'forecast_value': float(predictions[i]), 'forecast_type': '4'}
-                print(data_dict)
+                # print(data_dict)
                 # 读取现有预测数据
                 predict_data_ori = np.array(
                     GetPredictDataFromDB(row_name='actual_time', table_name=output_sheet, actual_time='actual_time',
